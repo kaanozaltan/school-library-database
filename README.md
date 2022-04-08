@@ -11,4 +11,5 @@ Each library item in the system will have a unique ID, title, author or authors,
 - Servet Gülnaroğlu - 21902474 - Section 2
 - Taha Batur Şenli - 21901857 - Section 3
 
-[Link to the proposal](https://kaanozaltan.github.io/school-library-database/Group26.pdf)
+[Link to the proposal](https://kaanozaltan.github.io/school-library-database/Group26Proposal.pdf)
+[Link to the proposal](https://kaanozaltan.github.io/school-library-database/Group26DesignReport.pdf)
