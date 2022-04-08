@@ -12,4 +12,4 @@ Each library item in the system will have a unique ID, title, author or authors,
 - Taha Batur Şenli - 21901857 - Section 3
 
 [Link to the proposal](https://kaanozaltan.github.io/school-library-database/Group26Proposal.pdf)
-[Link to the proposal](https://kaanozaltan.github.io/school-library-database/Group26DesignReport.pdf)
+[Link to the design report](https://kaanozaltan.github.io/school-library-database/Group26DesignReport.pdf)
