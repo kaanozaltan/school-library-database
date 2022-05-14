@@ -85,6 +85,7 @@ function Navbar() {
     };
 
     const currentState = useSelector((state) => {
+        console.log(state);
         return state;
     });
 

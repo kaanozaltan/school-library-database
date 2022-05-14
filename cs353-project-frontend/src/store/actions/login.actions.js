@@ -9,12 +9,16 @@ export function userLogin(user, navigate) {
             .post("http://localhost:8080/login", user)
             .then((res) => {
                 console.log("login actions", res.data);
-                localStorage.setItem("token", res.data.token);
-                dispatch({
-                    type: Actions.SET_USER,
-                    user: res.data.user,
-                });
-                navigate("/home");
+                if ("msg" in res.data) {
+                    alert(res.data.msg);
+                } else {
+                    // localStorage.setItem("token", res.data.token);
+                    dispatch({
+                        type: Actions.SET_USER,
+                        user: res.data.user,
+                    });
+                    navigate("/home");
+                }
             })
             .catch((err) => {
                 alert("you could not logged in");
@@ -29,13 +33,15 @@ export function userRegister(user, navigate) {
         axios
             .post("http://localhost:8080/register", user)
             .then((res) => {
-                console.log("login actions", res.data);
-                // localStorage.setItem("token", res.data.token);
+                console.log("user register response ", res.data);
+                if ("msg" in res.data) {
+                    alert(res.data.msg);
+                }
                 dispatch({
                     type: Actions.REGISTER_USER,
                     user: user,
                 });
-                navigate("/login");
+                //navigate("/login");
             })
             .catch((err) => {
                 alert("you could not sign up");

@@ -17,6 +17,8 @@ import AssignedItems from "./components/AssignedItems.js";
 import MyItems from "./components/MyItems.js";
 import Warnings from "./components/Warnings.js";
 import Users from "./components/Users.js";
+import RegisterANewItem from "./components/RegisterANewItem.js";
+
 export default function PageRoutes() {
     return (
         <Router>
@@ -44,6 +46,11 @@ export default function PageRoutes() {
                     <Route exact path="/myItems" element={<MyItems />} />
                     <Route exact path="/warnings" element={<Warnings />} />
                     <Route exact path="/users" element={<Users />} />
+                    <Route
+                        exact
+                        path="/registerANewItem"
+                        element={<RegisterANewItem />}
+                    />
                 </Routes>
             </div>
         </Router>

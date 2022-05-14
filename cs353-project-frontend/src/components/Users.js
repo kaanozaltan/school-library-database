@@ -115,19 +115,11 @@ function Users() {
             last_name: "Ozaltan",
         },
     ];
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-    const handleClose2 = () => {
-        setOpen2(false);
-    };
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
-        // console.log(values);
     };
     const handleClickOpen = () => {
         setOpen(true);
@@ -387,7 +379,7 @@ function Users() {
                                             <TableRow>
                                                 <TableCell>User ID</TableCell>
                                                 <TableCell>Last Name</TableCell>
-                                                <TableCell>Status</TableCell>
+                                                <TableCell></TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -399,10 +391,9 @@ function Users() {
                                                                 student.user_id
                                                             }
                                                             sx={{
-                                                                "&:last-child td, &:last-child th":
-                                                                    {
-                                                                        border: 0,
-                                                                    },
+                                                                "&:last-child td, &:last-child th": {
+                                                                    border: 0,
+                                                                },
                                                                 minHeight:
                                                                     "100px",
                                                             }}
@@ -423,8 +414,7 @@ function Users() {
                                                                         setValues(
                                                                             {
                                                                                 ...values,
-                                                                                ["choosedStudent"]:
-                                                                                    student,
+                                                                                ["choosedStudent"]: student,
                                                                             }
                                                                         );
                                                                         setOpenAssignModal(

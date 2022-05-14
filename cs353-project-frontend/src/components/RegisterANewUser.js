@@ -31,8 +31,12 @@ import FormGroup from "@mui/material/FormGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Autocomplete from "@mui/material/Autocomplete";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import { toHaveFormValues } from "@testing-library/jest-dom/dist/matchers";
 
 const theme = createTheme();
+
 function RegisterANewUser() {
     // const [values, setValues] = useState({
     //     email: "",
@@ -43,9 +47,9 @@ function RegisterANewUser() {
     //     showPassword: false,
     // });
     const [values, setValues] = useState({
-        email: "servetggg@gmail.com",
+        email: "servet.gulnaroglu@ug.bilkent.edu.tr",
         password: "123123123",
-        cell_phone: "05051461111",
+        cell_phone: "905051461111",
         user_id: "21902473",
         showPassword: false,
         userType: "STUDENT",
@@ -54,6 +58,7 @@ function RegisterANewUser() {
         department: "CS",
         office_number: "EA-506",
         user_name: "servetg",
+        is_graduate: false,
     });
     const departments = [{ label: "CS" }, { label: "EE" }, { label: "ME" }];
 
@@ -62,20 +67,18 @@ function RegisterANewUser() {
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
     };
+
     const handleSubmit = (event) => {
         event.preventDefault();
         //const data = new FormData(event.currentTarget);
-        if (values.cell_phone.length != 11) {
-            alert("Phone number is not valid");
-            return;
+        // if (values.cell_phone.length != 12) {
+        //     alert("Phone number is not valid");
+        //     return;
+        // }
+        if (values.department === "" && values.userType == "STUDENT") {
+            alert("Choose a department");
         }
-        const user = {
-            email: values.email,
-            password: values.password,
-            cell_phone: values.cell_phone,
-            name: values.name,
-            user_id: values.user_id,
-        };
+        const user = values;
         console.log(user);
         dispatch(userRegister(user, navigate));
     };
@@ -84,11 +87,6 @@ function RegisterANewUser() {
             ...values,
             showPassword: !values.showPassword,
         });
-    };
-    const handleMouseDownPassword = (
-        event: React.MouseEvent<HTMLButtonElement>
-    ) => {
-        event.preventDefault();
     };
     return (
         <ThemeProvider theme={theme}>
@@ -238,17 +236,15 @@ function RegisterANewUser() {
                                     placeholder=""
                                     type="text"
                                 />{" "}
-                                <Autocomplete
-                                    disablePortal
-                                    id="combo-box-demo"
-                                    options={departments}
-                                    sx={{ width: 300 }}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="Department"
-                                        />
-                                    )}
+                                <TextField
+                                    sx={{ m: 1, width: "100%" }}
+                                    id="standard-basic"
+                                    label="Department"
+                                    variant="standard"
+                                    value={values.department}
+                                    onChange={handleChange("department")}
+                                    placeholder="CS"
+                                    type="text"
                                 />
                             </>
                         ) : (
@@ -308,21 +304,31 @@ function RegisterANewUser() {
                                     placeholder="05_________"
                                     type="tel"
                                 />
-                                <Autocomplete
-                                    disablePortal
-                                    id="combo-box-demo"
-                                    options={departments}
-                                    sx={{ width: 300 }}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="Department"
-                                        />
-                                    )}
+                                <TextField
+                                    sx={{ m: 1, width: "100%" }}
+                                    id="standard-basic"
+                                    label="Department"
+                                    variant="standard"
+                                    value={values.department}
+                                    onChange={handleChange("department")}
+                                    placeholder="CS"
+                                    type="text"
                                 />
                                 <FormGroup>
                                     <FormControlLabel
-                                        control={<Checkbox color="success" />}
+                                        control={
+                                            <Checkbox
+                                                checked={values.is_graduate}
+                                                onChange={() => {
+                                                    setValues({
+                                                        ...values,
+                                                        is_graduate:
+                                                            !values.is_graduate,
+                                                    });
+                                                }}
+                                                color="success"
+                                            />
+                                        }
                                         label="Is Graduate?"
                                     />
                                 </FormGroup>

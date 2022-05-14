@@ -28,7 +28,6 @@ import { useNavigate } from "react-router-dom";
 const theme = createTheme();
 function Login() {
     const [values, setValues] = useState({
-        email: "servet.gulnaroglu@ug.bilkent.edu.tr",
         userID: "21902474",
         password: "123123123",
         showPassword: false,
@@ -41,8 +40,8 @@ function Login() {
     const handleSubmit = (event) => {
         event.preventDefault();
         //const data = new FormData(event.currentTarget);
-        const user = { email: values.email, password: values.password };
-        dispatch(userLogin(user, navigate));
+        const data = { id: values.userID, password: values.password };
+        dispatch(userLogin(data, navigate));
     };
     const handleClickShowPassword = () => {
         setValues({
@@ -133,6 +132,7 @@ function Login() {
                             fullWidth
                             variant="contained"
                             sx={{ mt: 4, mb: 2 }}
+                            onClick={handleSubmit}
                         >
                             Log in
                         </Button>
