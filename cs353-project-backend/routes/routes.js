@@ -7,6 +7,22 @@ const routes = (router) => {
         "/registerLibraryItem",
         new ManageLibrarianController().RegisterLibraryItem
     );
+    router.post(
+        "/bringAllUsers",
+        new ManageLibrarianController().BringAllUsers
+    );
+    router.post(
+        "/bringFilteredUsers",
+        new ManageLibrarianController().BringFilteredUsers
+    );
+    router.post(
+        "/bringAllLibraryItems",
+        new ManageLibrarianController().BringAllLibraryItems
+    );
+    router.post(
+        "/holdALibraryItem",
+        new ManageLibrarianController().HoldALibraryItem
+    );
 };
 
 module.exports = routes;

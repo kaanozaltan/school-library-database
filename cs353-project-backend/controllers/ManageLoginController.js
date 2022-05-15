@@ -37,6 +37,7 @@ module.exports = class UserSignupController {
                 cell_phone +
                 "' , '" +
                 email +
+                "','STUDENT" +
                 "')";
             connection.query(sql, (err, results) => {
                 console.log(err);
@@ -47,11 +48,17 @@ module.exports = class UserSignupController {
                     "','" +
                     department +
                     "' ,'" +
-                    1 +
+                    (is_graduate ? 1 : 0) +
                     "' )";
                 connection.query(sql2, (err, results) => {
                     console.log(err);
                     console.log(results);
+                    if (err) {
+                        res.json({
+                            msg: "ERROR",
+                        });
+                        return;
+                    }
                     res.json({
                         msg:
                             "Succesfully created the student with id " +
@@ -77,6 +84,7 @@ module.exports = class UserSignupController {
                 cell_phone +
                 "' , '" +
                 email +
+                "','INSTRUCTOR" +
                 "')";
             connection.query(sql, (err, results) => {
                 console.log(err);
@@ -94,9 +102,18 @@ module.exports = class UserSignupController {
             connection.query(sql, (err, results) => {
                 console.log(err);
                 // console.log(results);
-            });
-            res.json({
-                msg: "Succesfully create the instructor with id " + user_id,
+                if (err) {
+                    res.json({
+                        msg: "ERROR",
+                    });
+                    return;
+                } else {
+                    res.json({
+                        msg:
+                            "Succesfully create the instructor with id " +
+                            user_id,
+                    });
+                }
             });
         }
 

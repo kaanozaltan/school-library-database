@@ -4,7 +4,6 @@ let allTables = [
     "DROP TABLE IF EXISTS library_item",
     "DROP TABLE IF EXISTS authors",
     "DROP TABLE IF EXISTS genre",
-
     "DROP TABLE IF EXISTS book",
     "DROP TABLE IF EXISTS journal",
     "DROP TABLE IF EXISTS instructor",

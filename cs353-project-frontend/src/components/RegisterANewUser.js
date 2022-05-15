@@ -50,7 +50,7 @@ function RegisterANewUser() {
         email: "servet.gulnaroglu@ug.bilkent.edu.tr",
         password: "123123123",
         cell_phone: "905051461111",
-        user_id: "21902473",
+        user_id: "21902474",
         showPassword: false,
         userType: "STUDENT",
         last_name: "Gulnaroglu",
@@ -273,7 +273,7 @@ function RegisterANewUser() {
                                     label="First name"
                                     variant="standard"
                                     value={values.first_name}
-                                    onChange={handleChange("name")}
+                                    onChange={handleChange("first_name")}
                                     type="text"
                                 />
                                 <TextField
@@ -282,7 +282,7 @@ function RegisterANewUser() {
                                     label="Last name"
                                     variant="standard"
                                     value={values.last_name}
-                                    onChange={handleChange("name")}
+                                    onChange={handleChange("last_name")}
                                     type="text"
                                 />
                                 <TextField
@@ -291,7 +291,7 @@ function RegisterANewUser() {
                                     label="User name"
                                     variant="standard"
                                     value={values.user_name}
-                                    onChange={handleChange("name")}
+                                    onChange={handleChange("user_name")}
                                     type="text"
                                 />
                                 <TextField
@@ -322,8 +322,7 @@ function RegisterANewUser() {
                                                 onChange={() => {
                                                     setValues({
                                                         ...values,
-                                                        is_graduate:
-                                                            !values.is_graduate,
+                                                        is_graduate: !values.is_graduate,
                                                     });
                                                 }}
                                                 color="success"

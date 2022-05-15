@@ -24,10 +24,6 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useDispatch, useSelector } from "react-redux";
 import { userRegister } from "../store/actions/login.actions.js";
-import {
-    bringSportActivityTimes,
-    reserve,
-} from "../store/actions/reservation.actions.js";
 import ReactPhoneInput from "react-phone-input-material-ui";
 import { useNavigate } from "react-router-dom";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -73,6 +69,10 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 // import SearchBar from "material-ui-search-bar";
 import Modal from "@mui/material/Modal";
+import {
+    bringAllLibraryItems,
+    holdALibraryItem,
+} from "../store/actions/all.actions.js";
 const theme = createTheme();
 
 const style = {
@@ -100,6 +100,10 @@ function LibraryItems() {
         seaerchText: "",
         assignStudentSearchText: "",
         choosedLibraryItemForAssignment: {},
+        titleFilter: "",
+        authorFilter: "",
+        yearFilter: "",
+        typeFilter: "",
     });
     const [open, setOpen] = React.useState(false);
     const [open2, setOpen2] = React.useState(false);
@@ -179,6 +183,9 @@ function LibraryItems() {
         console.log(state);
         return state;
     });
+    useEffect(() => {
+        dispatch(bringAllLibraryItems());
+    }, []);
 
     return (
         <>
@@ -400,6 +407,92 @@ function LibraryItems() {
                                     <Table aria-label="simple table">
                                         <TableHead>
                                             <TableRow>
+                                                <TableCell>
+                                                    <TextField
+                                                        sx={{
+                                                            m: 1,
+                                                            width: "100%",
+                                                        }}
+                                                        id="standard-basic"
+                                                        variant="standard"
+                                                        value={
+                                                            values.titleFilter
+                                                        }
+                                                        placeholder="Search by title"
+                                                        onChange={handleChange(
+                                                            "titleFilter"
+                                                        )}
+                                                        type="text"
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <TextField
+                                                        sx={{
+                                                            m: 1,
+                                                            width: "100%",
+                                                        }}
+                                                        id="standard-basic"
+                                                        variant="standard"
+                                                        value={
+                                                            values.authorFilter
+                                                        }
+                                                        placeholder="by authors"
+                                                        onChange={handleChange(
+                                                            "authorFilter"
+                                                        )}
+                                                        type="text"
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <TextField
+                                                        sx={{
+                                                            m: 1,
+                                                            width: "100%",
+                                                        }}
+                                                        id="standard-basic"
+                                                        variant="standard"
+                                                        value={
+                                                            values.yearFilter
+                                                        }
+                                                        placeholder="by year"
+                                                        onChange={handleChange(
+                                                            "yearFilter"
+                                                        )}
+                                                        type="text"
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <TextField
+                                                        sx={{
+                                                            m: 1,
+                                                            width: "100%",
+                                                        }}
+                                                        id="standard-basic"
+                                                        variant="standard"
+                                                        value={
+                                                            values.typeFilter
+                                                        }
+                                                        placeholder="by type"
+                                                        onChange={handleChange(
+                                                            "typeFilter"
+                                                        )}
+                                                        type="text"
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Button
+                                                        onClick={() => {
+                                                            dispatch();
+                                                            return null;
+                                                        }}
+                                                        color="success"
+                                                        variant="contained"
+                                                    >
+                                                        Search
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
                                                 <TableCell>Title</TableCell>
                                                 <TableCell>Author</TableCell>
                                                 <TableCell>Year</TableCell>
@@ -408,119 +501,181 @@ function LibraryItems() {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {books.map((libraryItem, index) => {
-                                                return (
-                                                    <>
-                                                        <TableRow
-                                                            key={
-                                                                libraryItem.catalog_id
-                                                            }
-                                                            sx={{
-                                                                "&:last-child td, &:last-child th":
-                                                                    {
+                                            {currentState.all.libraryItems.map(
+                                                (libraryItem, index) => {
+                                                    return (
+                                                        <>
+                                                            <TableRow
+                                                                key={
+                                                                    libraryItem.catalog_id
+                                                                }
+                                                                sx={{
+                                                                    "&:last-child td, &:last-child th": {
                                                                         border: 0,
                                                                     },
-                                                                minHeight:
-                                                                    "100px",
-                                                            }}
-                                                        >
-                                                            <TableCell>
-                                                                {
-                                                                    libraryItem.title
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {libraryItem.authors.map(
-                                                                    (
-                                                                        author
-                                                                    ) => {
-                                                                        return (
-                                                                            <p>
-                                                                                {
-                                                                                    author.author
-                                                                                }
-                                                                            </p>
-                                                                        );
+                                                                    minHeight:
+                                                                        "100px",
+                                                                }}
+                                                            >
+                                                                <TableCell>
+                                                                    {
+                                                                        libraryItem.title
                                                                     }
-                                                                )}
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {
-                                                                    libraryItem.publish_year
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {
-                                                                    libraryItem.type
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {libraryItem.is_available ? (
-                                                                    <Button
-                                                                        onClick={() => {
-                                                                            return null;
-                                                                        }}
-                                                                        color="success"
-                                                                        variant="contained"
-                                                                        style={{
-                                                                            backgroundColor:
-                                                                                "green",
-                                                                            padding:
-                                                                                "5px",
-                                                                            color: "white",
-                                                                            margin: "5px",
-                                                                            borderRadius:
-                                                                                "5px",
-                                                                        }}
-                                                                    >
-                                                                        Hold
-                                                                    </Button>
-                                                                ) : (
-                                                                    <p
-                                                                        style={{
-                                                                            color: "red",
-                                                                            padding:
-                                                                                "5px",
-                                                                        }}
-                                                                    >
-                                                                        Borrowed
-                                                                    </p>
-                                                                )}
-                                                                <br />
-                                                                <Button
-                                                                    onClick={() => {
-                                                                        setValues(
-                                                                            {
-                                                                                ...values,
-                                                                                ["choosedLibraryItemForAssignment"]:
-                                                                                    libraryItem,
-                                                                            }
-                                                                        );
-                                                                        setOpenAssignModal(
-                                                                            true
-                                                                        );
-                                                                    }}
-                                                                    color="primary"
-                                                                    variant="contained"
-                                                                    style={{
-                                                                        backgroundColor:
-                                                                            "#1876d1",
-                                                                        padding:
-                                                                            "10px",
-                                                                        color: "white",
-                                                                        margin: "5px",
-                                                                        borderRadius:
-                                                                            "5px",
-                                                                    }}
-                                                                >
-                                                                    Assign to
-                                                                    Students
-                                                                </Button>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    </>
-                                                );
-                                            })}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {
+                                                                        libraryItem.authors
+                                                                    }
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {
+                                                                        libraryItem.publish_year
+                                                                    }
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {
+                                                                        libraryItem.type
+                                                                    }
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {"user_type" in
+                                                                        currentState
+                                                                            .login
+                                                                            .user &&
+                                                                        currentState
+                                                                            .login
+                                                                            .user
+                                                                            .user_type !=
+                                                                            "LIBRARIAN" &&
+                                                                        (libraryItem.is_available ? (
+                                                                            <Button
+                                                                                onClick={() => {
+                                                                                    let data = {
+                                                                                        user_id:
+                                                                                            currentState
+                                                                                                .login
+                                                                                                .user
+                                                                                                .user_id,
+                                                                                        catalog_id:
+                                                                                            libraryItem.catalog_id,
+                                                                                    };
+                                                                                    dispatch(
+                                                                                        holdALibraryItem(
+                                                                                            data
+                                                                                        )
+                                                                                    );
+                                                                                }}
+                                                                                color="success"
+                                                                                variant="contained"
+                                                                                style={{
+                                                                                    backgroundColor:
+                                                                                        "green",
+                                                                                    padding:
+                                                                                        "5px",
+                                                                                    color:
+                                                                                        "white",
+                                                                                    margin:
+                                                                                        "5px",
+                                                                                    borderRadius:
+                                                                                        "5px",
+                                                                                }}
+                                                                            >
+                                                                                Hold
+                                                                            </Button>
+                                                                        ) : (
+                                                                            <p
+                                                                                style={{
+                                                                                    color:
+                                                                                        "red",
+                                                                                    padding:
+                                                                                        "5px",
+                                                                                }}
+                                                                            >
+                                                                                Borrowed
+                                                                            </p>
+                                                                        ))}
+                                                                    <br />
+                                                                    {Object.keys(
+                                                                        currentState
+                                                                            .login
+                                                                            .user
+                                                                            .user_type
+                                                                    ).length !=
+                                                                        0 &&
+                                                                        currentState
+                                                                            .login
+                                                                            .user
+                                                                            .user_type ==
+                                                                            "LIBRARIAN" &&
+                                                                        (libraryItem.is_available ? (
+                                                                            <p
+                                                                                style={{
+                                                                                    color:
+                                                                                        "green",
+                                                                                    padding:
+                                                                                        "5px",
+                                                                                }}
+                                                                            >
+                                                                                Available
+                                                                            </p>
+                                                                        ) : (
+                                                                            <p
+                                                                                style={{
+                                                                                    color:
+                                                                                        "red",
+                                                                                    padding:
+                                                                                        "5px",
+                                                                                }}
+                                                                            >
+                                                                                Borrowed
+                                                                            </p>
+                                                                        ))}
+                                                                    {"user_type" in
+                                                                        currentState
+                                                                            .login
+                                                                            .user &&
+                                                                        currentState
+                                                                            .login
+                                                                            .user ==
+                                                                            "INSTRUCTOR" && (
+                                                                            <Button
+                                                                                onClick={() => {
+                                                                                    setValues(
+                                                                                        {
+                                                                                            ...values,
+                                                                                            ["choosedLibraryItemForAssignment"]: libraryItem,
+                                                                                        }
+                                                                                    );
+                                                                                    setOpenAssignModal(
+                                                                                        true
+                                                                                    );
+                                                                                }}
+                                                                                color="primary"
+                                                                                variant="contained"
+                                                                                style={{
+                                                                                    backgroundColor:
+                                                                                        "#1876d1",
+                                                                                    padding:
+                                                                                        "10px",
+                                                                                    color:
+                                                                                        "white",
+                                                                                    margin:
+                                                                                        "5px",
+                                                                                    borderRadius:
+                                                                                        "5px",
+                                                                                }}
+                                                                            >
+                                                                                Assign
+                                                                                to
+                                                                                Students
+                                                                            </Button>
+                                                                        )}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </>
+                                                    );
+                                                }
+                                            )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

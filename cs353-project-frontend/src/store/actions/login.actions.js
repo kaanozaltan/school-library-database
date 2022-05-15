@@ -17,6 +17,7 @@ export function userLogin(user, navigate) {
                         type: Actions.SET_USER,
                         user: res.data.user,
                     });
+                    localStorage.setItem("user", JSON.stringify(res.data.user));
                     navigate("/home");
                 }
             })

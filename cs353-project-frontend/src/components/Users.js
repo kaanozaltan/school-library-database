@@ -24,10 +24,6 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useDispatch, useSelector } from "react-redux";
 import { userRegister } from "../store/actions/login.actions.js";
-import {
-    bringSportActivityTimes,
-    reserve,
-} from "../store/actions/reservation.actions.js";
 import ReactPhoneInput from "react-phone-input-material-ui";
 import { useNavigate } from "react-router-dom";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -73,6 +69,12 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 // import SearchBar from "material-ui-search-bar";
 import Modal from "@mui/material/Modal";
+import {
+    bringAllUsers,
+    bringFilteredUsers,
+} from "../store/actions/all.actions.js";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 const theme = createTheme();
 
 const style = {
@@ -98,8 +100,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 function Users() {
     const [values, setValues] = useState({
         choosedStudent: {},
+        nameFilter: "",
+        idFilter: "",
+        userType: "ALL",
     });
-    console.log(values.choosedStudent);
     const [open, setOpen] = React.useState(false);
     const [open2, setOpen2] = React.useState(false);
 
@@ -129,6 +133,10 @@ function Users() {
         console.log(state);
         return state;
     });
+
+    useEffect(() => {
+        dispatch(bringAllUsers());
+    }, []);
 
     return (
         <>
@@ -331,7 +339,7 @@ function Users() {
                             return null;
                         }}
                     /> */}
-                    {students.length == -1 ? (
+                    {currentState.all.bringAllUsers.length == 0 ? (
                         <>
                             <Box
                                 sx={{
@@ -354,6 +362,68 @@ function Users() {
                         </>
                     ) : (
                         <>
+                            <ToggleButtonGroup
+                                color="primary"
+                                value={values.userType}
+                                exclusive
+                                style={{
+                                    margin: "auto",
+                                    textAlign: "center",
+                                    paddingLeft: "30px",
+                                }}
+                            >
+                                <ToggleButton
+                                    value="ALL"
+                                    style={{
+                                        backgroundColor:
+                                            values.userType == "ALL"
+                                                ? "#9ed0ff"
+                                                : "",
+                                    }}
+                                    onClick={() => {
+                                        setValues({
+                                            ...values,
+                                            ["userType"]: "ALL",
+                                        });
+                                    }}
+                                >
+                                    All
+                                </ToggleButton>
+                                <ToggleButton
+                                    value="STUDENT"
+                                    style={{
+                                        backgroundColor:
+                                            values.userType == "STUDENT"
+                                                ? "#9ed0ff"
+                                                : "",
+                                    }}
+                                    onClick={() => {
+                                        setValues({
+                                            ...values,
+                                            ["userType"]: "STUDENT",
+                                        });
+                                    }}
+                                >
+                                    Student
+                                </ToggleButton>
+                                <ToggleButton
+                                    value="INSTRUCTOR"
+                                    style={{
+                                        backgroundColor:
+                                            values.userType == "INSTRUCTOR"
+                                                ? "#9ed0ff"
+                                                : "",
+                                    }}
+                                    onClick={() => {
+                                        setValues({
+                                            ...values,
+                                            ["userType"]: "INSTRUCTOR",
+                                        });
+                                    }}
+                                >
+                                    Instructor
+                                </ToggleButton>
+                            </ToggleButtonGroup>
                             <Box
                                 sx={{
                                     display: "flex",
@@ -377,60 +447,121 @@ function Users() {
                                     <Table aria-label="simple table">
                                         <TableHead>
                                             <TableRow>
+                                                <TableCell>
+                                                    <TextField
+                                                        sx={{
+                                                            m: 1,
+                                                            width: "100%",
+                                                        }}
+                                                        id="standard-basic"
+                                                        variant="standard"
+                                                        value={values.idFilter}
+                                                        placeholder="Search by id"
+                                                        onChange={handleChange(
+                                                            "idFilter"
+                                                        )}
+                                                        type="text"
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <TextField
+                                                        sx={{
+                                                            m: 1,
+                                                            width: "100%",
+                                                        }}
+                                                        id="standard-basic"
+                                                        variant="standard"
+                                                        value={
+                                                            values.nameFilter
+                                                        }
+                                                        placeholder="Search by last name"
+                                                        onChange={handleChange(
+                                                            "nameFilter"
+                                                        )}
+                                                        type="text"
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Button
+                                                        onClick={() => {
+                                                            dispatch(
+                                                                bringFilteredUsers(
+                                                                    {
+                                                                        nameFilter:
+                                                                            values.nameFilter,
+                                                                        idFilter:
+                                                                            values.idFilter,
+                                                                    }
+                                                                )
+                                                            );
+                                                            return null;
+                                                        }}
+                                                        color="success"
+                                                        variant="contained"
+                                                    >
+                                                        Search
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableHead>
+                                            <TableRow>
                                                 <TableCell>User ID</TableCell>
                                                 <TableCell>Last Name</TableCell>
                                                 <TableCell></TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {students.map((student, index) => {
-                                                return (
-                                                    <>
-                                                        <TableRow
-                                                            key={
-                                                                student.user_id
-                                                            }
-                                                            sx={{
-                                                                "&:last-child td, &:last-child th": {
-                                                                    border: 0,
-                                                                },
-                                                                minHeight:
-                                                                    "100px",
-                                                            }}
-                                                        >
-                                                            <TableCell>
-                                                                {
+                                            {currentState.all.bringAllUsers.map(
+                                                (student, index) => {
+                                                    return (
+                                                        <>
+                                                            <TableRow
+                                                                key={
                                                                     student.user_id
                                                                 }
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {
-                                                                    student.last_name
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <Button
-                                                                    onClick={() => {
-                                                                        setValues(
-                                                                            {
-                                                                                ...values,
-                                                                                ["choosedStudent"]: student,
-                                                                            }
-                                                                        );
-                                                                        setOpenAssignModal(
-                                                                            true
-                                                                        );
-                                                                    }}
-                                                                    color="primary"
-                                                                    variant="contained"
-                                                                >
-                                                                    Select
-                                                                </Button>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    </>
-                                                );
-                                            })}
+                                                                sx={{
+                                                                    "&:last-child td, &:last-child th": {
+                                                                        border: 0,
+                                                                    },
+                                                                    minHeight:
+                                                                        "100px",
+                                                                }}
+                                                            >
+                                                                <TableCell>
+                                                                    {
+                                                                        student.user_id
+                                                                    }
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {
+                                                                        student.last_name
+                                                                    }
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Button
+                                                                        onClick={() => {
+                                                                            setValues(
+                                                                                {
+                                                                                    ...values,
+                                                                                    ["choosedStudent"]: student,
+                                                                                }
+                                                                            );
+                                                                            setOpenAssignModal(
+                                                                                true
+                                                                            );
+                                                                        }}
+                                                                        color="primary"
+                                                                        variant="contained"
+                                                                    >
+                                                                        Select
+                                                                    </Button>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </>
+                                                    );
+                                                }
+                                            )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

@@ -1,9 +1,9 @@
 import * as Actions from "../actions/actions.js";
 const initialState = {
-    user: null,
+    user: {},
 };
 
-const user = function (state = initialState, action) {
+const user = function(state = initialState, action) {
     switch (action.type) {
         case Actions.SET_USER: {
             return {

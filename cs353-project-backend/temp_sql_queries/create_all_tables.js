@@ -13,7 +13,7 @@ let createTables = {
     createJournalTable:
         "CREATE TABLE if not exists journal(    catalog_id int,    volume int,    issue int,    PRIMARY KEY (catalog_id),    FOREIGN KEY (catalog_id) REFERENCES library_item(catalog_id) ON UPDATE CASCADE ON DELETE RESTRICT);",
     createUserTable:
-        "CREATE TABLE if not exists user(    user_id int,    username varchar(64) NOT NULL,    first_name varchar(64) NOT NULL,    last_name varchar(64) NOT NULL,    hashed_password varchar(64) NOT NULL,    status boolean,    cell_phone varchar(12),    email varchar(64),    PRIMARY KEY (user_id));",
+        "CREATE TABLE if not exists user(    user_id int,    username varchar(64) NOT NULL,    first_name varchar(64) NOT NULL,    last_name varchar(64) NOT NULL,    hashed_password varchar(64) NOT NULL,    status boolean,    cell_phone varchar(12),    email varchar(64),  user_type varchar(16),  PRIMARY KEY (user_id));",
     createInstructorTable:
         "CREATE TABLE if not exists instructor(    user_id int,    dept varchar(64),    office_room varchar(64),    PRIMARY KEY (user_id),    FOREIGN KEY (user_id) REFERENCES user(user_id) ON UPDATE CASCADE ON DELETE RESTRICT);",
     createStudentTable:

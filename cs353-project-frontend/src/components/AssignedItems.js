@@ -24,10 +24,6 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useDispatch, useSelector } from "react-redux";
 import { userRegister } from "../store/actions/login.actions.js";
-import {
-    bringSportActivityTimes,
-    reserve,
-} from "../store/actions/reservation.actions.js";
 import ReactPhoneInput from "react-phone-input-material-ui";
 import { useNavigate } from "react-router-dom";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -422,10 +418,9 @@ function AssignedItems() {
                                                                 libraryItem.catalog_id
                                                             }
                                                             sx={{
-                                                                "&:last-child td, &:last-child th":
-                                                                    {
-                                                                        border: 0,
-                                                                    },
+                                                                "&:last-child td, &:last-child th": {
+                                                                    border: 0,
+                                                                },
                                                                 minHeight:
                                                                     "100px",
                                                             }}
