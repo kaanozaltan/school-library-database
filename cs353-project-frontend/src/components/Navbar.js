@@ -61,6 +61,23 @@ const instructorPages = [
 // ];
 
 function Navbar() {
+    useEffect(() => {
+        console.log(currentState.login.user, "USERR");
+        if (Object.keys(currentState.login.user).length == 0) {
+            let user = JSON.parse(localStorage.getItem("user"));
+            console.log(JSON.parse(localStorage.getItem("user")), "TESTT");
+            if (JSON.parse(localStorage.getItem("user")) == null) {
+                console.log("TEST");
+                navigate("/login");
+                return;
+            }
+
+            dispatch({
+                type: "SET_USER",
+                user: user,
+            });
+        }
+    }, []);
     const [values, setValues] = useState({
         email: "",
         password: "",
@@ -114,24 +131,6 @@ function Navbar() {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
-
-    useEffect(() => {
-        console.log(currentState.login.user, "USERR");
-        if (Object.keys(currentState.login.user).length == 0) {
-            let user = JSON.parse(localStorage.getItem("user"));
-            console.log(JSON.parse(localStorage.getItem("user")), "TESTT");
-            if (JSON.parse(localStorage.getItem("user")) == null) {
-                console.log("TEST");
-                navigate("/login");
-                return;
-            }
-
-            dispatch({
-                type: "SET_USER",
-                user: user,
-            });
-        }
-    }, []);
 
     useEffect(() => {
         if (currentState.login.user == null) {

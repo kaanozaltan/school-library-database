@@ -70,8 +70,15 @@ import Slide from "@mui/material/Slide";
 // import SearchBar from "material-ui-search-bar";
 import Modal from "@mui/material/Modal";
 import {
+    bringAllAvailableAndHoldedItemsForLend,
+    bringAllReturnableItems,
     bringAllUsers,
     bringFilteredUsers,
+    bringMyItems,
+    bringUserWarnLibraryItems,
+    lendItem,
+    returnItem,
+    warnUser,
 } from "../store/actions/all.actions.js";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
@@ -103,11 +110,23 @@ function Users() {
         nameFilter: "",
         idFilter: "",
         userType: "ALL",
+        status: "ON_HOLD",
+        warnMessage:
+            "Return date to return the book is due! Pleaase return it as soon as possible.",
+        lendReturnDate: "2019-08-29",
+        warnTitle: "Return date is due!",
     });
     const [open, setOpen] = React.useState(false);
     const [open2, setOpen2] = React.useState(false);
 
     const [openAssignModal, setOpenAssignModal] = React.useState(false);
+    const [openUserSpecificModal, setOpenUserSpecificModal] = React.useState(
+        false
+    );
+
+    const [openLendModal, setOpenLendModal] = React.useState(false);
+    const [openReturnModal, setOpenReturnModal] = React.useState(false);
+    const [openWarnModal, setOpenWarnModal] = React.useState(false);
 
     const students = [
         {
@@ -204,125 +223,6 @@ function Users() {
                     </Button>
                 </DialogActions>
             </Dialog> */}
-            {/* <Modal
-                open={openAssignModal}
-                onClose={() => {
-                    setOpenAssignModal(false);
-                }}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={style}>
-                    {false ? (
-                        <CircularProgress />
-                    ) : (
-                        <>
-                            {" "}
-                            <Typography
-                                id="modal-modal-title"
-                                variant="h6"
-                                component="h2"
-                            >
-                                User {values.choosedStudent}
-                            </Typography>
-                            <SearchBar
-                                value={values.assignStudentSearchText}
-                                onChange={(newValue) => null}
-                                onRequestSearch={() => {
-                                    return null;
-                                }}
-                            />
-                            <Table aria-label="simple table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Student ID</TableCell>
-                                        <TableCell>Last Name</TableCell>
-                                        <TableCell></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell>View Items</TableCell>
-                                        <TableCell>
-                                            <Button
-                                                color="success"
-                                                style={{
-                                                    backgroundColor: "green",
-                                                    color: "white",
-                                                    padding: "5px",
-                                                    borderRadius: "3px",
-                                                }}
-                                            >
-                                                On-Hold
-                                            </Button>
-                                            <Button
-                                                color="success"
-                                                style={{
-                                                    backgroundColor: "green",
-                                                    color: "white",
-                                                    padding: "5px",
-                                                    borderRadius: "3px",
-                                                }}
-                                            >
-                                                Borrowed
-                                            </Button>
-                                            <Button
-                                                color="success"
-                                                style={{
-                                                    backgroundColor: "green",
-                                                    color: "white",
-                                                    padding: "5px",
-                                                    borderRadius: "3px",
-                                                }}
-                                            >
-                                                Returned
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>Actions</TableCell>
-                                        <TableCell>
-                                            <Button
-                                                color="success"
-                                                style={{
-                                                    backgroundColor: "green",
-                                                    color: "white",
-                                                    padding: "5px",
-                                                    borderRadius: "3px",
-                                                }}
-                                            >
-                                                On-Hold
-                                            </Button>
-                                            <Button
-                                                color="success"
-                                                style={{
-                                                    backgroundColor: "green",
-                                                    color: "white",
-                                                    padding: "5px",
-                                                    borderRadius: "3px",
-                                                }}
-                                            >
-                                                Borrowed
-                                            </Button>
-                                            <Button
-                                                color="success"
-                                                style={{
-                                                    backgroundColor: "green",
-                                                    color: "white",
-                                                    padding: "5px",
-                                                    borderRadius: "3px",
-                                                }}
-                                            >
-                                                Returned
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </>
-                    )}
-                </Box>
-            </Modal> */}
             <ThemeProvider theme={theme}>
                 <Box
                     xs={{ mt: 10 }}
@@ -570,6 +470,722 @@ function Users() {
                     )}
                 </Box>
             </ThemeProvider>
+
+            <Modal
+                open={openUserSpecificModal}
+                onClose={() => {
+                    setOpenUserSpecificModal(false);
+                }}
+                xs={{ zIndex: "100000" }}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style} style={{ minWidth: "fit-content" }}>
+                    {Object.keys(values.choosedStudent).length == 0 ? (
+                        <CircularProgress />
+                    ) : (
+                        <>
+                            {" "}
+                            <Typography
+                                id="modal-modal-title"
+                                variant="h6"
+                                component="h2"
+                            >
+                                User {values.choosedStudent.user_id}
+                            </Typography>
+                            <Typography
+                                id="modal-modal-title"
+                                variant="h6"
+                                component="h2"
+                            >
+                                {values.status}
+                            </Typography>
+                            {currentState.all.myLibraryItems.length == 0 ? (
+                                <>
+                                    <Typography
+                                        id="modal-modal-title"
+                                        variant="h6"
+                                        component="h2"
+                                    >
+                                        No items
+                                        {/* <Box
+                                            sx={{
+                                                display: "flex",
+                                                textAlign: "center",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                margin: "auto",
+                                            }}
+                                        >
+                                            <CircularProgress
+                                                xs={{ textAlign: "center" }}
+                                            />
+                                        </Box> */}
+                                    </Typography>
+                                </>
+                            ) : (
+                                <>
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            textAlign: "center",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            margin: "auto",
+                                            mt: 5,
+                                            mb: 5,
+                                        }}
+                                    >
+                                        <TableContainer
+                                            sx={{
+                                                minWidth: 650,
+                                                maxWidth: 800,
+                                                justifyContent: "center",
+                                                textAlign: "center",
+                                            }}
+                                            component={Paper}
+                                        >
+                                            <Table aria-label="simple table">
+                                                {values.status == "ON_HOLD" ? (
+                                                    <>
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    Title
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Authors
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Publish Year
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Till
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {currentState.all.myLibraryItems.map(
+                                                                (
+                                                                    libraryItem,
+                                                                    index
+                                                                ) => {
+                                                                    // if (
+                                                                    //     libraryItem.status !=
+                                                                    //     "ON_HOLD"
+                                                                    // )
+                                                                    //     return;
+                                                                    return (
+                                                                        <>
+                                                                            <TableRow
+                                                                                key={
+                                                                                    libraryItem.catalog_id
+                                                                                }
+                                                                                sx={{
+                                                                                    "&:last-child td, &:last-child th": {
+                                                                                        border: 0,
+                                                                                    },
+                                                                                    minHeight:
+                                                                                        "100px",
+                                                                                }}
+                                                                            >
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.title
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.authors
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.publish_year
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell
+                                                                                    xs={{
+                                                                                        whiteSpace:
+                                                                                            "nowrap",
+                                                                                    }}
+                                                                                >
+                                                                                    {"date" in
+                                                                                        libraryItem &&
+                                                                                        libraryItem.date.substring(
+                                                                                            0,
+                                                                                            10
+                                                                                        )}
+                                                                                </TableCell>
+                                                                            </TableRow>
+                                                                        </>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </TableBody>
+                                                    </>
+                                                ) : (
+                                                    <></>
+                                                )}
+                                                {values.status == "BORROWED" ? (
+                                                    <>
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    Title
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Authors
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Publish Year
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Type
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Return Date
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {currentState.all.myLibraryItems.map(
+                                                                (
+                                                                    libraryItem,
+                                                                    index
+                                                                ) => {
+                                                                    // if (
+                                                                    //     libraryItem.status !=
+                                                                    //     "BORROWED"
+                                                                    // )
+                                                                    //     return;
+                                                                    return (
+                                                                        <>
+                                                                            <TableRow
+                                                                                key={
+                                                                                    libraryItem.catalog_id
+                                                                                }
+                                                                                sx={{
+                                                                                    "&:last-child td, &:last-child th": {
+                                                                                        border: 0,
+                                                                                    },
+                                                                                    minHeight:
+                                                                                        "100px",
+                                                                                }}
+                                                                            >
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.title
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.authors
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.publish_year
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.type
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.return_date
+                                                                                    }
+                                                                                </TableCell>
+                                                                            </TableRow>
+                                                                        </>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </TableBody>
+                                                    </>
+                                                ) : (
+                                                    <></>
+                                                )}
+                                                {values.status == "RETURNED" ? (
+                                                    <>
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                <TableCell>
+                                                                    Title
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Authors
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Publish Year
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Type
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    Return Date
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {currentState.all.myLibraryItems.map(
+                                                                (
+                                                                    libraryItem,
+                                                                    index
+                                                                ) => {
+                                                                    // if (
+                                                                    //     libraryItem.status !=
+                                                                    //     "RETURNED"
+                                                                    // )
+                                                                    //     return;
+                                                                    return (
+                                                                        <>
+                                                                            <TableRow
+                                                                                key={
+                                                                                    libraryItem.catalog_id
+                                                                                }
+                                                                                sx={{
+                                                                                    "&:last-child td, &:last-child th": {
+                                                                                        border: 0,
+                                                                                    },
+                                                                                    minHeight:
+                                                                                        "100px",
+                                                                                }}
+                                                                            >
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.title
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.authors
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.publish_year
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.type
+                                                                                    }
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    {
+                                                                                        libraryItem.return_date
+                                                                                    }
+                                                                                </TableCell>
+                                                                            </TableRow>
+                                                                        </>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </TableBody>
+                                                    </>
+                                                ) : (
+                                                    <></>
+                                                )}
+                                            </Table>
+                                        </TableContainer>
+                                    </Box>
+                                </>
+                            )}
+                        </>
+                    )}
+                </Box>
+            </Modal>
+
+            <Modal
+                open={openLendModal}
+                onClose={() => {
+                    setOpenLendModal(false);
+                }}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style} style={{ minWidth: "fit-content" }}>
+                    {Object.keys(values.choosedStudent).length == 0 ? (
+                        <CircularProgress />
+                    ) : (
+                        <>
+                            {" "}
+                            <Typography
+                                id="modal-modal-title"
+                                variant="h6"
+                                component="h2"
+                            >
+                                Lend item to user{" "}
+                                {values.choosedStudent.user_id}
+                            </Typography>
+                            <TextField
+                                sx={{ m: 1, width: "100%" }}
+                                id="standard-basic"
+                                label="Set Return Date"
+                                variant="standard"
+                                value={values.lendReturnDate}
+                                onChange={handleChange("lendReturnDate")}
+                                placeholder="yyyy-mm-dd"
+                                type="text"
+                            />
+                            <Table aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Title</TableCell>
+                                        <TableCell>Authors</TableCell>
+                                        <TableCell>Publish Year</TableCell>
+                                        <TableCell>Type</TableCell>
+                                        <TableCell></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {currentState.all.lendItems.map(
+                                        (libraryItem, index) => {
+                                            // if (
+                                            //     libraryItem.status !=
+                                            //     "BORROWED"
+                                            // )
+                                            //     return;
+                                            return (
+                                                <>
+                                                    <TableRow
+                                                        key={
+                                                            libraryItem.catalog_id
+                                                        }
+                                                        sx={{
+                                                            "&:last-child td, &:last-child th": {
+                                                                border: 0,
+                                                            },
+                                                            minHeight: "100px",
+                                                        }}
+                                                    >
+                                                        <TableCell>
+                                                            {libraryItem.title}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                libraryItem.authors
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                libraryItem.publish_year
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {libraryItem.type}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Button
+                                                                color="success"
+                                                                onClick={() => {
+                                                                    let data = {
+                                                                        catalog_id:
+                                                                            libraryItem.catalog_id,
+                                                                        student_user_id:
+                                                                            values
+                                                                                .choosedStudent
+                                                                                .user_id,
+                                                                        librarian_user_id:
+                                                                            currentState
+                                                                                .login
+                                                                                .user
+                                                                                .user_id,
+                                                                    };
+                                                                    dispatch(
+                                                                        lendItem(
+                                                                            data
+                                                                        )
+                                                                    );
+                                                                }}
+                                                                variant="contained"
+                                                            >
+                                                                Lend
+                                                            </Button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                </>
+                                            );
+                                        }
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </>
+                    )}
+                </Box>
+            </Modal>
+            <Modal
+                open={openReturnModal}
+                onClose={() => {
+                    setOpenReturnModal(false);
+                }}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style} style={{ minWidth: "fit-content" }}>
+                    {Object.keys(values.choosedStudent).length == 0 ? (
+                        <CircularProgress />
+                    ) : (
+                        <>
+                            {" "}
+                            <Typography
+                                id="modal-modal-title"
+                                variant="h6"
+                                component="h2"
+                            >
+                                User {values.choosedStudent.user_id}
+                            </Typography>
+                            <Typography
+                                id="modal-modal-title"
+                                variant="h6"
+                                component="h2"
+                            >
+                                Return Item
+                            </Typography>
+                            <Table aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Title</TableCell>
+                                        <TableCell>Authors</TableCell>
+                                        <TableCell>Publish Year</TableCell>
+                                        <TableCell>Type</TableCell>
+                                        {/* <TableCell>Return Date</TableCell> */}
+                                        <TableCell></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {currentState.all.returnableItems.map(
+                                        (libraryItem, index) => {
+                                            // if (
+                                            //     libraryItem.status !=
+                                            //     "BORROWED"
+                                            // )
+                                            //     return;
+                                            return (
+                                                <>
+                                                    <TableRow
+                                                        key={
+                                                            libraryItem.catalog_id
+                                                        }
+                                                        sx={{
+                                                            "&:last-child td, &:last-child th": {
+                                                                border: 0,
+                                                            },
+                                                            minHeight: "100px",
+                                                        }}
+                                                    >
+                                                        <TableCell>
+                                                            {libraryItem.title}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                libraryItem.authors
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                libraryItem.publish_year
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {libraryItem.type}
+                                                        </TableCell>
+                                                        {/* <TableCell>
+                                                            {
+                                                                libraryItem.return_date
+                                                            }
+                                                        </TableCell> */}
+                                                        <TableCell>
+                                                            <Button
+                                                                color="primary"
+                                                                variant="contained"
+                                                                onClick={() => {
+                                                                    let data = {
+                                                                        catalog_id:
+                                                                            libraryItem.catalog_id,
+                                                                        student_user_id:
+                                                                            values
+                                                                                .choosedStudent
+                                                                                .user_id,
+                                                                        librarian_user_id:
+                                                                            currentState
+                                                                                .login
+                                                                                .user
+                                                                                .user_id,
+                                                                    };
+                                                                    dispatch(
+                                                                        returnItem(
+                                                                            data
+                                                                        )
+                                                                    );
+                                                                }}
+                                                            >
+                                                                Return
+                                                            </Button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                </>
+                                            );
+                                        }
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </>
+                    )}
+                </Box>
+            </Modal>
+            <Modal
+                open={openWarnModal}
+                onClose={() => {
+                    setOpenWarnModal(false);
+                }}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style} style={{ minWidth: "fit-content" }}>
+                    {Object.keys(values.choosedStudent).length == 0 ? (
+                        <CircularProgress />
+                    ) : (
+                        <>
+                            {" "}
+                            <Typography
+                                id="modal-modal-title"
+                                variant="h6"
+                                component="h2"
+                            >
+                                User {values.choosedStudent.user_id}
+                            </Typography>
+                            <Typography
+                                id="modal-modal-title"
+                                variant="h6"
+                                component="h2"
+                            >
+                                Warn
+                            </Typography>
+                            {/* <TextField
+                                sx={{
+                                    m: 1,
+                                    width: "100%",
+                                }}
+                                id="standard-basic"
+                                label="Title"
+                                variant="standard"
+                                value={values.warnTitle}
+                                placeholder="Warn Message"
+                                onChange={handleChange("warnTitle")}
+                                type="text"
+                            /> */}
+                            <TextField
+                                sx={{
+                                    m: 1,
+                                    width: "100%",
+                                }}
+                                id="standard-basic"
+                                label="Message"
+                                variant="standard"
+                                value={values.warnMessage}
+                                placeholder="Warn Message"
+                                onChange={handleChange("warnMessage")}
+                                type="text"
+                            />
+                            <Table aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Title</TableCell>
+                                        <TableCell>Authors</TableCell>
+                                        <TableCell>Publish Year</TableCell>
+                                        <TableCell>Type</TableCell>
+                                        <TableCell>Return Date</TableCell>
+                                        <TableCell></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {currentState.all.myLibraryItems.map(
+                                        (libraryItem, index) => {
+                                            // if (
+                                            //     libraryItem.status !=
+                                            //     "BORROWED"
+                                            // )
+                                            //     return;
+                                            return (
+                                                <>
+                                                    <TableRow
+                                                        key={
+                                                            libraryItem.catalog_id
+                                                        }
+                                                        sx={{
+                                                            "&:last-child td, &:last-child th": {
+                                                                border: 0,
+                                                            },
+                                                            minHeight: "100px",
+                                                        }}
+                                                    >
+                                                        <TableCell>
+                                                            {libraryItem.title}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                libraryItem.authors
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                libraryItem.publish_year
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {libraryItem.type}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {
+                                                                libraryItem.return_date
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Button
+                                                                color="error"
+                                                                onClick={() => {
+                                                                    let data = {
+                                                                        librarian_user_id:
+                                                                            currentState
+                                                                                .login
+                                                                                .user
+                                                                                .user_id,
+                                                                        student_user_id:
+                                                                            values
+                                                                                .choosedStudent
+                                                                                .user_id,
+                                                                        description:
+                                                                            values.warnMessage,
+                                                                        catalog_id:
+                                                                            libraryItem.catalog_id,
+                                                                    };
+                                                                    dispatch(
+                                                                        warnUser(
+                                                                            data
+                                                                        )
+                                                                    );
+                                                                }}
+                                                                variant="contained"
+                                                            >
+                                                                Warn
+                                                            </Button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                </>
+                                            );
+                                        }
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </>
+                    )}
+                </Box>
+            </Modal>
+
             <Modal
                 open={openAssignModal}
                 onClose={() => {
@@ -592,13 +1208,6 @@ function Users() {
                                 User {values.choosedStudent.user_id}
                             </Typography>
                             <Table aria-label="simple table">
-                                {/* <TableHead>
-                                    <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Id</TableCell>
-                                        <TableCell>Status</TableCell>
-                                    </TableRow>
-                                </TableHead> */}
                                 <TableBody>
                                     <TableRow>
                                         <TableCell>View Items</TableCell>
@@ -612,6 +1221,25 @@ function Users() {
                                                     borderRadius: "3px",
                                                     margin: "10px",
                                                 }}
+                                                onClick={() => {
+                                                    setValues({
+                                                        ...values,
+                                                        status: "ON_HOLD",
+                                                    });
+                                                    setOpenUserSpecificModal(
+                                                        true
+                                                    );
+                                                    let data = {
+                                                        user_id:
+                                                            values
+                                                                .choosedStudent
+                                                                .user_id,
+                                                        status: "ON_HOLD",
+                                                    };
+                                                    dispatch(
+                                                        bringMyItems(data)
+                                                    );
+                                                }}
                                             >
                                                 On-Hold
                                             </Button>
@@ -624,6 +1252,25 @@ function Users() {
                                                     borderRadius: "3px",
                                                     margin: "10px",
                                                 }}
+                                                onClick={() => {
+                                                    setValues({
+                                                        ...values,
+                                                        status: "BORROWED",
+                                                    });
+                                                    setOpenUserSpecificModal(
+                                                        true
+                                                    );
+                                                    let data = {
+                                                        user_id:
+                                                            values
+                                                                .choosedStudent
+                                                                .user_id,
+                                                        status: "BORROWED",
+                                                    };
+                                                    dispatch(
+                                                        bringMyItems(data)
+                                                    );
+                                                }}
                                             >
                                                 Borrowed
                                             </Button>
@@ -635,6 +1282,25 @@ function Users() {
                                                     padding: "5px",
                                                     borderRadius: "3px",
                                                     margin: "10px",
+                                                }}
+                                                onClick={() => {
+                                                    setValues({
+                                                        ...values,
+                                                        status: "RETURNED",
+                                                    });
+                                                    setOpenUserSpecificModal(
+                                                        true
+                                                    );
+                                                    let data = {
+                                                        user_id:
+                                                            values
+                                                                .choosedStudent
+                                                                .user_id,
+                                                        status: "RETURNED",
+                                                    };
+                                                    dispatch(
+                                                        bringMyItems(data)
+                                                    );
                                                 }}
                                             >
                                                 Returned
@@ -653,6 +1319,17 @@ function Users() {
                                                     borderRadius: "3px",
                                                     margin: "10px",
                                                 }}
+                                                onClick={() => {
+                                                    setOpenLendModal(true);
+                                                    let data = {};
+                                                    data.user_id =
+                                                        values.choosedStudent.user_id;
+                                                    dispatch(
+                                                        bringAllAvailableAndHoldedItemsForLend(
+                                                            data
+                                                        )
+                                                    );
+                                                }}
                                             >
                                                 Lend Item
                                             </Button>
@@ -665,6 +1342,20 @@ function Users() {
                                                     borderRadius: "3px",
                                                     margin: "10px",
                                                 }}
+                                                onClick={() => {
+                                                    let data = {
+                                                        student_user_id:
+                                                            values
+                                                                .choosedStudent
+                                                                .user_id,
+                                                    };
+                                                    dispatch(
+                                                        bringAllReturnableItems(
+                                                            data
+                                                        )
+                                                    );
+                                                    setOpenReturnModal(true);
+                                                }}
                                             >
                                                 Return Item
                                             </Button>
@@ -676,6 +1367,17 @@ function Users() {
                                                     padding: "5px",
                                                     borderRadius: "3px",
                                                     margin: "10px",
+                                                }}
+                                                onClick={() => {
+                                                    let data = {};
+                                                    data.user_id =
+                                                        values.choosedStudent.user_id;
+                                                    data.status = "BORROWED";
+                                                    console.log(data);
+                                                    dispatch(
+                                                        bringMyItems(data)
+                                                    );
+                                                    setOpenWarnModal(true);
                                                 }}
                                             >
                                                 Warn

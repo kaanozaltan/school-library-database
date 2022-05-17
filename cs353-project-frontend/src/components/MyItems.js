@@ -70,6 +70,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 // import SearchBar from "material-ui-search-bar";
 import Modal from "@mui/material/Modal";
+import { bringMyItems } from "../store/actions/all.actions";
 const theme = createTheme();
 
 const style = {
@@ -83,20 +84,12 @@ const style = {
     boxShadow: 24,
     p: 4,
 };
-
-function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
-}
-
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function AssignedItems() {
+function MyItems() {
     const [values, setValues] = useState({
-        seaerchText: "",
-        assignStudentSearchText: "",
-        choosedLibraryItemForAssignment: {},
         status: "ON_HOLD",
     });
     const [open, setOpen] = React.useState(false);
@@ -104,106 +97,6 @@ function AssignedItems() {
 
     const [openAssignModal, setOpenAssignModal] = React.useState(false);
 
-    const books = [
-        {
-            catalog_id: 1,
-            title: "Beyaz Zamciklar Ulkesinde",
-            authors: [
-                {
-                    catalog_id: 1,
-                    author: "Kaan Ozaltan",
-                },
-            ],
-            call_no: "12312312",
-            publish_date: "02/02/2019",
-            publish_year: 2019,
-            is_available: false,
-            language: "English",
-            publisher: "TBS Yayincilik",
-            description: "A very lovely book",
-            type: "Book",
-            status: "ON_HOLD",
-            till: "29/05/2022",
-        },
-        {
-            catalog_id: 2,
-            title: "Selamun aleykum",
-            authors: [
-                {
-                    catalog_id: 2,
-                    author: "Hiassam",
-                },
-                {
-                    catalog_id: 2,
-                    author: "Namik Kemal",
-                },
-            ],
-            call_no: "12312322",
-            publish_date: "02/03/2019",
-            publish_year: 2019,
-            is_available: true,
-            language: "English",
-            publisher: "TBS Yayincilik",
-            description: "A very lovely book the second",
-            assignedBy: "Cancak Russo",
-            type: "Book",
-            status: "ON_HOLD",
-            till: "29/05/2022",
-        },
-        {
-            catalog_id: 1,
-            title: "Beyaz Zamciklar Ulkesinde",
-            authors: [
-                {
-                    catalog_id: 1,
-                    author: "Kaan Ozaltan",
-                },
-            ],
-            call_no: "12312312",
-            publish_date: "02/02/2019",
-            publish_year: 2019,
-            is_available: false,
-            language: "English",
-            publisher: "TBS Yayincilik",
-            description: "A very lovely book",
-            type: "Book",
-            assignedBy: "Coker A.",
-            status: "BORROWED",
-            return_date: "27/06/2022",
-        },
-        {
-            catalog_id: 1,
-            title: "Beyaz Zamciklar Ulkesinde",
-            authors: [
-                {
-                    catalog_id: 1,
-                    author: "Kaan Ozaltan",
-                },
-            ],
-            call_no: "12312312",
-            publish_date: "02/02/2019",
-            publish_year: 2019,
-            is_available: false,
-            language: "English",
-            publisher: "TBS Yayincilik",
-            description: "A very lovely book",
-            type: "Book",
-            assignedBy: "Coker A.",
-            status: "RETURNED",
-            return_date: "13/05/2022",
-        },
-    ];
-
-    const students = [
-        { name: "Kaan", id: "123123" },
-        { name: "Servet", id: "1231231231" },
-    ];
-    const handleClose = () => {
-        setOpen(false);
-    };
-    const handleClose2 = () => {
-        setOpen2(false);
-    };
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -224,6 +117,13 @@ function AssignedItems() {
         console.log(state);
         return state;
     });
+
+    useEffect(() => {
+        console.log(values.status);
+        let data = values;
+        data["user_id"] = currentState.login.user.user_id;
+        dispatch(bringMyItems(data));
+    }, [values.status, currentState.login.user]);
 
     return (
         <>
@@ -300,26 +200,13 @@ function AssignedItems() {
                         </ToggleButton>
                     </ToggleButtonGroup>
 
-                    {books.length == -1 ? (
+                    {currentState.all.myLibraryItems.length == 0 ? (
                         <>
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    textAlign: "center",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    margin: "auto",
-                                    mt: 10,
-                                    position: "absolute",
-                                    left: "50%",
-                                    top: "50%",
-                                    transform: "translate(-50%, -50%)",
-                                }}
-                            >
-                                <CircularProgress
+                            <h2>No Items</h2>
+
+                            {/* <CircularProgress
                                     xs={{ textAlign: "center" }}
-                                />
-                            </Box>
+                                /> */}
                         </>
                     ) : (
                         <>
@@ -352,21 +239,30 @@ function AssignedItems() {
                                                             Title
                                                         </TableCell>
                                                         <TableCell>
+                                                            Authors
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            Publish Year
+                                                        </TableCell>
+                                                        <TableCell>
                                                             Till
                                                         </TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {books.map(
+                                                    {currentState.all.myLibraryItems.map(
                                                         (
                                                             libraryItem,
                                                             index
                                                         ) => {
-                                                            if (
-                                                                libraryItem.status !=
-                                                                "ON_HOLD"
-                                                            )
-                                                                return;
+                                                            // if (
+                                                            //     libraryItem.status !=
+                                                            //     "ON_HOLD"
+                                                            // )
+                                                            //     return;
+                                                            console.log(
+                                                                libraryItem
+                                                            );
                                                             return (
                                                                 <>
                                                                     <TableRow
@@ -382,18 +278,32 @@ function AssignedItems() {
                                                                         }}
                                                                     >
                                                                         <TableCell>
-                                                                            {libraryItem.title +
-                                                                                " " +
-                                                                                libraryItem
-                                                                                    .authors[0]
-                                                                                    .author +
-                                                                                " published at " +
-                                                                                libraryItem.publish_year}
+                                                                            {
+                                                                                libraryItem.title
+                                                                            }
                                                                         </TableCell>
                                                                         <TableCell>
                                                                             {
-                                                                                libraryItem.till
+                                                                                libraryItem.authors
                                                                             }
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {
+                                                                                libraryItem.publish_year
+                                                                            }
+                                                                        </TableCell>
+                                                                        <TableCell
+                                                                            xs={{
+                                                                                whiteSpace:
+                                                                                    "nowrap",
+                                                                            }}
+                                                                        >
+                                                                            {"date" in
+                                                                                libraryItem &&
+                                                                                libraryItem.date.substring(
+                                                                                    0,
+                                                                                    10
+                                                                                )}
                                                                         </TableCell>
                                                                     </TableRow>
                                                                 </>
@@ -413,6 +323,12 @@ function AssignedItems() {
                                                             Title
                                                         </TableCell>
                                                         <TableCell>
+                                                            Authors
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            Publish Year
+                                                        </TableCell>
+                                                        <TableCell>
                                                             Type
                                                         </TableCell>
                                                         <TableCell>
@@ -421,16 +337,19 @@ function AssignedItems() {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {books.map(
+                                                    {currentState.all.myLibraryItems.map(
                                                         (
                                                             libraryItem,
                                                             index
                                                         ) => {
-                                                            if (
-                                                                libraryItem.status !=
-                                                                "BORROWED"
-                                                            )
-                                                                return;
+                                                            // if (
+                                                            //     libraryItem.status !=
+                                                            //     "BORROWED"
+                                                            // )
+                                                            //     return;
+                                                            console.log(
+                                                                libraryItem
+                                                            );
                                                             return (
                                                                 <>
                                                                     <TableRow
@@ -446,13 +365,19 @@ function AssignedItems() {
                                                                         }}
                                                                     >
                                                                         <TableCell>
-                                                                            {libraryItem.title +
-                                                                                " " +
-                                                                                libraryItem
-                                                                                    .authors[0]
-                                                                                    .author +
-                                                                                " published at " +
-                                                                                libraryItem.publish_year}
+                                                                            {
+                                                                                libraryItem.title
+                                                                            }
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {
+                                                                                libraryItem.authors
+                                                                            }
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {
+                                                                                libraryItem.publish_year
+                                                                            }
                                                                         </TableCell>
                                                                         <TableCell>
                                                                             {
@@ -482,6 +407,12 @@ function AssignedItems() {
                                                             Title
                                                         </TableCell>
                                                         <TableCell>
+                                                            Authors
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            Publish Year
+                                                        </TableCell>
+                                                        <TableCell>
                                                             Type
                                                         </TableCell>
                                                         <TableCell>
@@ -490,16 +421,16 @@ function AssignedItems() {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {books.map(
+                                                    {currentState.all.myLibraryItems.map(
                                                         (
                                                             libraryItem,
                                                             index
                                                         ) => {
-                                                            if (
-                                                                libraryItem.status !=
-                                                                "RETURNED"
-                                                            )
-                                                                return;
+                                                            // if (
+                                                            //     libraryItem.status !=
+                                                            //     "RETURNED"
+                                                            // )
+                                                            //     return;
                                                             return (
                                                                 <>
                                                                     <TableRow
@@ -515,13 +446,19 @@ function AssignedItems() {
                                                                         }}
                                                                     >
                                                                         <TableCell>
-                                                                            {libraryItem.title +
-                                                                                " " +
-                                                                                libraryItem
-                                                                                    .authors[0]
-                                                                                    .author +
-                                                                                " published at " +
-                                                                                libraryItem.publish_year}
+                                                                            {
+                                                                                libraryItem.title
+                                                                            }
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {
+                                                                                libraryItem.authors
+                                                                            }
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {
+                                                                                libraryItem.publish_year
+                                                                            }
                                                                         </TableCell>
                                                                         <TableCell>
                                                                             {
@@ -554,4 +491,4 @@ function AssignedItems() {
     );
 }
 
-export default AssignedItems;
+export default MyItems;

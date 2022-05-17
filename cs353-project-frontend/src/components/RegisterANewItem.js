@@ -172,10 +172,11 @@ function RegisterANewItem() {
                         <TextField
                             sx={{ m: 1, width: "100%" }}
                             id="standard-basic"
-                            label="Publis Date"
+                            label="Publish Date"
                             variant="standard"
                             value={values.publish_date}
                             onChange={handleChange("publish_date")}
+                            placeholder="yyyy-mm-dd"
                             type="text"
                         />
                         <TextField

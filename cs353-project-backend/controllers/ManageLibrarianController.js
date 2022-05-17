@@ -1,5 +1,18 @@
 "use strict";
+
 let connection = require("../database");
+
+const formatDate = (date) => {
+    var d = new Date(date),
+        month = "" + (d.getMonth() + 1),
+        day = "" + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+};
 
 module.exports = class ManageLibrarianController {
     async RegisterLibraryItem(req, res) {
@@ -108,7 +121,7 @@ module.exports = class ManageLibrarianController {
                     "' , '" +
                     description +
                     "' , '" +
-                    authorscl +
+                    authors +
                     "')";
 
                 connection.query(sql, (err, results) => {
@@ -143,6 +156,268 @@ module.exports = class ManageLibrarianController {
         });
     }
 
+    async WarnUser(req, res) {
+        let { catalog_id, student_user_id, librarian_user_id, description } =
+            req.body;
+        console.log(req.body);
+        let sql =
+            "SELECT is_available from library_item where catalog_id=" +
+            catalog_id;
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.log(err);
+                res.json({
+                    msg: "Error!",
+                });
+                return;
+            }
+            if (results.length >= 0) {
+                let maxOperationId;
+                let maxOperationSql =
+                    "SELECT operation_id FROM operation ORDER BY operation_id DESC LIMIT 0, 1";
+                connection.query(maxOperationSql, (err, results) => {
+                    if (err) {
+                        console.log(err);
+                        res.json({ msg: "Error!" });
+                        return;
+                    }
+                    if (results.length == 0) {
+                        maxOperationId = 1;
+                    } else {
+                        maxOperationId = results[0].operation_id + 1;
+                    }
+                    let date = formatDate(Date.now());
+                    let insertOperationSql =
+                        "INSERT INTO operation VALUES ( " +
+                        maxOperationId +
+                        ", '" +
+                        date +
+                        "'  )";
+                    connection.query(insertOperationSql, (err, results) => {
+                        if (err) {
+                            console.log(err);
+                            res.json({ msg: "Error!" });
+                            return;
+                        }
+                        let insertIntoMakeOperationSQL =
+                            "INSERT INTO make_operation VALUES ( " +
+                            maxOperationId +
+                            ", " +
+                            librarian_user_id +
+                            ")";
+                        connection.query(
+                            insertIntoMakeOperationSQL,
+                            (err, results) => {
+                                if (err) {
+                                    console.log(err);
+                                    res.json({ msg: "Error!" });
+                                    return;
+                                }
+                                let insertIntoWarnSQL =
+                                    "INSERT INTO warn VALUES (" +
+                                    catalog_id +
+                                    ", " +
+                                    maxOperationId +
+                                    ", " +
+                                    student_user_id +
+                                    ",0 ,'" +
+                                    description +
+                                    "')";
+                                connection.query(
+                                    insertIntoWarnSQL,
+                                    (err, results) => {
+                                        if (err) {
+                                            console.log(err);
+                                            res.json({ msg: "Error!" });
+                                            return;
+                                        }
+                                        res.json({
+                                            msg: "Warn operation is succesful!",
+                                        });
+                                    }
+                                );
+                            }
+                        );
+                    });
+                });
+            } else {
+                res.json("There is no such library item!");
+            }
+        });
+    }
+
+    async RemoveAWarning(req, res) {
+        let { operation_id } = req.body;
+        let updateWarnSQL =
+            "UPDATE warn SET is_cleared=1 WHERE operation_id=" + operation_id;
+        connection.query(updateWarnSQL, (err, results) => {
+            if (err) {
+                console.log(err);
+                res.json({
+                    msg: "Error!",
+                });
+                return;
+            }
+            res.json({ msg: "Removed the warning!" });
+        });
+    }
+
+    async LendItem(req, res) {
+        let { catalog_id, student_user_id, librarian_user_id } = req.body;
+        let sql =
+            "SELECT is_available from library_item where catalog_id=" +
+            catalog_id;
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.log(err);
+                res.json({
+                    msg: "Error!",
+                });
+                return;
+            }
+            if (results.length >= 0) {
+                let maxOperationId;
+                let maxOperationSql =
+                    "SELECT operation_id FROM operation ORDER BY operation_id DESC LIMIT 0, 1";
+                connection.query(maxOperationSql, (err, results) => {
+                    if (err) {
+                        console.log(err);
+                        return;
+                    }
+                    if (results.length == 0) {
+                        maxOperationId = 1;
+                    } else {
+                        maxOperationId = results[0].operation_id + 1;
+                    }
+                    let date = formatDate(Date.now());
+                    let insertOperationSql =
+                        "INSERT INTO operation VALUES ( " +
+                        maxOperationId +
+                        ", '" +
+                        date +
+                        "'  )";
+                    connection.query(insertOperationSql, (err, results) => {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
+                        let insertIntoMakeOperationSQL =
+                            "INSERT INTO make_operation VALUES ( " +
+                            maxOperationId +
+                            ", " +
+                            librarian_user_id +
+                            ")";
+                        connection.query(
+                            insertIntoMakeOperationSQL,
+                            (err, results) => {
+                                if (err) {
+                                    console.log(err);
+                                    return;
+                                }
+                                let insertIntoBorrowReturnSQL =
+                                    "INSERT INTO borrow_return VALUES (" +
+                                    catalog_id +
+                                    ", " +
+                                    maxOperationId +
+                                    ", " +
+                                    student_user_id +
+                                    ", 0)";
+
+                                connection.query(
+                                    insertIntoBorrowReturnSQL,
+                                    (err, results) => {
+                                        if (err) {
+                                            console.log(err);
+                                            res.json({ msg: "Error!" });
+                                            return;
+                                        } else {
+                                            let updateHoldSql =
+                                                "UPDATE hold SET is_cleared=1 WHERE user_id=" +
+                                                student_user_id +
+                                                " and catalog_id=" +
+                                                catalog_id;
+                                            connection.query(
+                                                updateHoldSql,
+                                                (err, results) => {
+                                                    if (err) {
+                                                        console.log(err);
+                                                        res.json({
+                                                            msg: "Error!",
+                                                        });
+                                                        return;
+                                                    }
+
+                                                    let updateLibraryItem =
+                                                        "UPDATE library_item SET is_available = 0 WHERE catalog_id=" +
+                                                        catalog_id;
+                                                    connection.query(
+                                                        updateLibraryItem,
+                                                        (err, results) => {
+                                                            if (err) {
+                                                                console.log(
+                                                                    err
+                                                                );
+                                                                res.json(err);
+                                                                return;
+                                                            }
+                                                            res.json({
+                                                                msg:
+                                                                    "Successfuly lended! Operation id=" +
+                                                                    maxOperationId +
+                                                                    ", User-id: " +
+                                                                    student_user_id,
+                                                            });
+                                                        }
+                                                    );
+                                                }
+                                            );
+                                        }
+                                    }
+                                );
+                            }
+                        );
+                    });
+                });
+            }
+        });
+    }
+
+    async ReturnItem(req, res) {
+        let { catalog_id, student_user_id } = req.body;
+
+        let returnItemSQL =
+            "UPDATE borrow_return SET is_returned=1 where catalog_id=" +
+            catalog_id +
+            " and user_id=" +
+            student_user_id;
+        connection.query(returnItemSQL, (err, results) => {
+            if (err) {
+                console.log(err);
+                res.json({
+                    msg: "Error! Couldn't return the book!",
+                });
+                return;
+            }
+            let updateLibraryItemSQL =
+                "UPDATE library_item SET is_available=1 where catalog_id=" +
+                catalog_id;
+            connection.query(updateLibraryItemSQL, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.json({
+                        msg: "Error! Couldn't return the book!",
+                    });
+                    return;
+                }
+                res.json({
+                    msg:
+                        "Successfuly returned the library item with id " +
+                        catalog_id,
+                });
+            });
+        });
+    }
+
     async HoldALibraryItem(req, res) {
         let { catalog_id, user_id } = req.body;
         let holdDate = new Date(Date.now());
@@ -165,6 +440,9 @@ module.exports = class ManageLibrarianController {
         connection.query(sql, (err, results) => {
             if (err) {
                 console.log(err);
+                res.json({
+                    msg: "Error! Couldn't hold the book! The book may be holded already.",
+                });
                 return;
             }
             console.log(results);
@@ -180,6 +458,130 @@ module.exports = class ManageLibrarianController {
             });
         });
     }
+
+    async BringWarnings(req, res) {
+        let { user_id } = req.body;
+        console.log(user_id);
+        //         SELECT * FROM (library_db.warn NATURAL JOIN library_db.user) CROSS JOIN library_db.library_item
+        // where user_id=21902474 and library_db.warn.catalog_id=library_db.library_item.catalog_id;
+        let sql =
+            "SELECT *, warn.description  from user NATURAL JOIN warn NATURAL JOIN operation CROSS JOIN library_item where user_id=" +
+            user_id +
+            " and warn.catalog_id=library_item.catalog_id and warn.is_cleared=0";
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.log(err);
+                res.json(err);
+                return;
+            }
+            console.log("warn results");
+            console.log(results);
+            res.json(results);
+        });
+    }
+
+    async BringMyItems(req, res) {
+        let { status, user_id } = req.body;
+        let sql = "";
+        if (status == "ON_HOLD") {
+            sql =
+                "SELECT catalog_id, title, date, authors, description, publish_year FROM  user NATURAL JOIN hold NATURAL JOIN library_item WHERE user_id= " +
+                user_id +
+                " and is_cleared=0";
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                    return;
+                }
+                let allHoldedItems = results;
+                console.log(allHoldedItems);
+                res.json(allHoldedItems);
+            });
+        } else if (status == "BORROWED") {
+            sql =
+                "SELECT catalog_id, title, authors, description, publish_year, type FROM  user NATURAL JOIN borrow_return NATURAL JOIN library_item WHERE user_id= " +
+                user_id +
+                " and is_returned=0";
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                    return;
+                }
+                let allBorrowedItems = results;
+                console.log(allBorrowedItems);
+                res.json(allBorrowedItems);
+            });
+        } else if (status == "RETURNED") {
+            sql =
+                "SELECT catalog_id, title, authors, description,publish_year, type FROM  user NATURAL JOIN borrow_return NATURAL JOIN library_item WHERE user_id= " +
+                user_id +
+                " and is_returned=1";
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                    return;
+                }
+                let allReturnedItems = results;
+                console.log(allReturnedItems);
+                res.json(allReturnedItems);
+            });
+        } else {
+            res.json({
+                msg: "Wrong status type! Found status type: " + status,
+            });
+        }
+    }
+
+    async BringAllReturnableItems(req, res) {
+        let { student_user_id } = req.body;
+
+        let sql =
+            "SELECT * from library_item NATURAL JOIN borrow_return NATURAL JOIN user where is_returned=0 and user_id=" +
+            student_user_id;
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            console.log("All returnables");
+            console.log(results);
+            res.json(results);
+        });
+    }
+
+    async BringAllAvailableAndHoldedItemsForLend(req, res) {
+        let { user_id } = req.body;
+
+        let sql = "SELECT * from library_item where is_available = 1";
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            console.log("All availables");
+            console.log(results);
+            let allAvailableLibraryItems = results;
+            sql =
+                "SELECT * from user NATURAL JOIN hold NATURAL JOIN library_item where user_id=" +
+                user_id +
+                " and is_cleared=0";
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log("HOlded books");
+                console.log(user_id);
+                console.log(results);
+                let allItems = allAvailableLibraryItems.concat(results);
+                res.json(allItems);
+            });
+        });
+    }
+
     async BringAllLibraryItems(req, res) {
         let sql = "SELECT * from library_item";
         connection.query(sql, (err, results) => {

@@ -21,9 +21,9 @@ let createTables = {
     createLibrarianTable:
         "CREATE TABLE if not exists librarian(    user_id int,    working_library varchar(64),    PRIMARY KEY (user_id),    FOREIGN KEY (user_id) REFERENCES user(user_id) ON UPDATE CASCADE ON DELETE RESTRICT);",
     createOperetionTable:
-        "CREATE TABLE if not exists operation(    operation_id int,    date date,    user_id int,    PRIMARY KEY (operation_id),    FOREIGN KEY (user_id) REFERENCES librarian(user_id) ON UPDATE CASCADE ON DELETE RESTRICT);",
+        "CREATE TABLE if not exists operation(    operation_id int,    date date,  PRIMARY KEY (operation_id))",
     createHoldTable:
-        "CREATE TABLE if not exists hold(    catalog_id int,    user_id int,    date date,    is_cleared boolean,    PRIMARY KEY (catalog_id, user_id, date),    FOREIGN KEY (catalog_id) REFERENCES library_item(catalog_id) ON UPDATE CASCADE ON DELETE RESTRICT,    FOREIGN KEY (user_id) REFERENCES user(user_id) ON UPDATE CASCADE ON DELETE RESTRICT);",
+        "CREATE TABLE if not exists hold(    catalog_id int,    user_id int,    date date,    is_cleared boolean, FOREIGN KEY (catalog_id) REFERENCES library_item(catalog_id) ON UPDATE CASCADE ON DELETE RESTRICT,    FOREIGN KEY (user_id) REFERENCES user(user_id) ON UPDATE CASCADE ON DELETE RESTRICT);",
     createBorrowReturnTable:
         "CREATE TABLE if not exists borrow_return(    catalog_id int,    operation_id int,    user_id int,    is_returned boolean,    PRIMARY KEY (catalog_id, operation_id, user_id),    FOREIGN KEY (catalog_id) REFERENCES library_item(catalog_id) ON UPDATE CASCADE ON DELETE RESTRICT,    FOREIGN KEY (operation_id) REFERENCES operation(operation_id) ON UPDATE CASCADE ON DELETE RESTRICT,    FOREIGN KEY (user_id) REFERENCES user(user_id) ON UPDATE CASCADE ON DELETE RESTRICT);",
     createWarnTable:
@@ -38,6 +38,8 @@ let createTables = {
         "CREATE TABLE if not exists takes(    course_id int,    user_id int,    PRIMARY KEY (course_id, user_id),    FOREIGN KEY (course_id) REFERENCES course(course_id) ON UPDATE CASCADE ON DELETE RESTRICT,    FOREIGN KEY (user_id) REFERENCES user(user_id) ON UPDATE CASCADE ON DELETE RESTRICT);",
     createAssignTable:
         "CREATE TABLE if not exists assign(    catalog_id int,    student_user_id int,    instructor_user_id int,    PRIMARY KEY (catalog_id, student_user_id, instructor_user_id),    FOREIGN KEY (catalog_id) REFERENCES library_item(catalog_id) ON UPDATE CASCADE ON DELETE RESTRICT,    FOREIGN KEY (student_user_id) REFERENCES student(user_id) ON UPDATE CASCADE ON DELETE RESTRICT,    FOREIGN KEY (instructor_user_id) REFERENCES instructor(user_id) ON UPDATE CASCADE ON DELETE RESTRICT);",
+    createMakeOperationTable:
+        "CREATE TABLE if not exists make_operation(    operation_id int,    user_id int,  PRIMARY KEY (operation_id, user_id),    FOREIGN KEY (operation_id) REFERENCES operation(operation_id) ON UPDATE CASCADE ON DELETE RESTRICT,    FOREIGN KEY (user_id) REFERENCES librarian(user_id) ON UPDATE CASCADE ON DELETE RESTRICT);",
 };
 
 Object.keys(createTables).map((key, index) => {

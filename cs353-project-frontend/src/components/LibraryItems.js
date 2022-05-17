@@ -110,49 +110,6 @@ function LibraryItems() {
 
     const [openAssignModal, setOpenAssignModal] = React.useState(false);
 
-    const books = [
-        {
-            catalog_id: 1,
-            title: "Beyaz Zamciklar Ulkesinde",
-            authors: [
-                {
-                    catalog_id: 1,
-                    author: "Kaan Ozaltan",
-                },
-            ],
-            call_no: "12312312",
-            publish_date: "02/02/2019",
-            publish_year: 2019,
-            is_available: false,
-            language: "English",
-            publisher: "TBS Yayincilik",
-            description: "A very lovely book",
-            type: "Book",
-        },
-        {
-            catalog_id: 2,
-            title: "Selamun aleykum",
-            authors: [
-                {
-                    catalog_id: 2,
-                    author: "Hiassam",
-                },
-                {
-                    catalog_id: 2,
-                    author: "Namik Kemal",
-                },
-            ],
-            call_no: "12312322",
-            publish_date: "02/03/2019",
-            publish_year: 2019,
-            is_available: true,
-            language: "English",
-            publisher: "TBS Yayincilik",
-            description: "A very lovely book the second",
-            type: "Book",
-        },
-    ];
-
     const students = [
         { name: "Kaan", id: "123123" },
         { name: "Servet", id: "1231231231" },
@@ -361,7 +318,7 @@ function LibraryItems() {
                             return null;
                         }}
                     /> */}
-                    {books.length == -1 ? (
+                    {currentState.all.libraryItems.length == -1 ? (
                         <>
                             <Box
                                 sx={{

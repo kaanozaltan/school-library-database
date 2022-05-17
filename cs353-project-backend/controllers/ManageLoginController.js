@@ -40,8 +40,12 @@ module.exports = class UserSignupController {
                 "','STUDENT" +
                 "')";
             connection.query(sql, (err, results) => {
-                console.log(err);
                 // console.log(results);
+                if (err) {
+                    console.log(err);
+                    res.json({ msg: "Error" });
+                    return;
+                }
                 let sql2 =
                     "INSERT INTO student VALUES ( '" +
                     user_id +
@@ -89,29 +93,33 @@ module.exports = class UserSignupController {
             connection.query(sql, (err, results) => {
                 console.log(err);
                 // console.log(results);
-            });
-
-            sql =
-                "INSERT INTO instructor VALUES ( '" +
-                user_id +
-                "','" +
-                department +
-                "' ,'" +
-                office_number +
-                "' )";
-            connection.query(sql, (err, results) => {
-                console.log(err);
-                // console.log(results);
                 if (err) {
-                    res.json({
-                        msg: "ERROR",
-                    });
+                    console.log(err);
+                    res.json({ msg: "Error" });
                     return;
-                } else {
-                    res.json({
-                        msg:
-                            "Succesfully create the instructor with id " +
-                            user_id,
+                    sql =
+                        "INSERT INTO instructor VALUES ( '" +
+                        user_id +
+                        "','" +
+                        department +
+                        "' ,'" +
+                        office_number +
+                        "' )";
+                    connection.query(sql, (err, results) => {
+                        console.log(err);
+                        // console.log(results);
+                        if (err) {
+                            res.json({
+                                msg: "ERROR",
+                            });
+                            return;
+                        } else {
+                            res.json({
+                                msg:
+                                    "Succesfully create the instructor with id " +
+                                    user_id,
+                            });
+                        }
                     });
                 }
             });

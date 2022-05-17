@@ -23,6 +23,26 @@ const routes = (router) => {
         "/holdALibraryItem",
         new ManageLibrarianController().HoldALibraryItem
     );
+    router.post("/bringMyItems", new ManageLibrarianController().BringMyItems);
+    router.post(
+        "/bringAllAvailableAndHoldedItemsForLend",
+        new ManageLibrarianController().BringAllAvailableAndHoldedItemsForLend
+    );
+    router.post("/lendItem", new ManageLibrarianController().LendItem);
+    router.post(
+        "/bringAllReturnableItems",
+        new ManageLibrarianController().BringAllReturnableItems
+    );
+    router.post("/returnItem", new ManageLibrarianController().ReturnItem);
+    router.post("/warnUser", new ManageLibrarianController().WarnUser);
+    router.post(
+        "/bringWarnings",
+        new ManageLibrarianController().BringWarnings
+    );
+    router.post(
+        "/removeAWarning",
+        new ManageLibrarianController().RemoveAWarning
+    );
 };
 
 module.exports = routes;

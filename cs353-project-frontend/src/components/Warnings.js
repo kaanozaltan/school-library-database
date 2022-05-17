@@ -54,6 +54,7 @@ import StepConnector, {
 } from "@mui/material/StepConnector";
 
 import CircularProgress from "@mui/material/CircularProgress";
+import { bringWarnings, removeAWarning } from "../store/actions/all.actions";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -148,6 +149,15 @@ function Warnings() {
         console.log(state);
         return state;
     });
+
+    useEffect(() => {
+        if ("user_id" in currentState.login.user) {
+            let data = {
+                user_id: currentState.login.user.user_id,
+            };
+            dispatch(bringWarnings(data));
+        }
+    }, [currentState.login.user]);
 
     return (
         <>
@@ -315,26 +325,12 @@ function Warnings() {
                         maxWidth: "850px",
                     }}
                 >
-                    {warnings.length == -1 ? (
+                    {currentState.all.warnings.length == 0 ? (
                         <>
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    textAlign: "center",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    margin: "auto",
-                                    mt: 10,
-                                    position: "absolute",
-                                    left: "50%",
-                                    top: "50%",
-                                    transform: "translate(-50%, -50%)",
-                                }}
-                            >
-                                <CircularProgress
+                            <h1>No Warnings</h1>
+                            {/* <CircularProgress
                                     xs={{ textAlign: "center" }}
-                                />
-                            </Box>
+                                /> */}
                         </>
                     ) : (
                         <>
@@ -351,7 +347,7 @@ function Warnings() {
                                     textAlign: "left",
                                 }}
                             >
-                                {warnings.map((warning) => {
+                                {currentState.all.warnings.map((warning) => {
                                     return (
                                         <>
                                             <Box
@@ -364,10 +360,11 @@ function Warnings() {
                                                 }}
                                             >
                                                 <h2 style={{ margin: "20px" }}>
-                                                    {warning.title}
+                                                    {warning.description}
                                                 </h2>
                                                 <p style={{ margin: "20px" }}>
-                                                    {warning.description}
+                                                    For the library item:{" "}
+                                                    {" " + warning.title}
                                                 </p>
                                                 <p style={{ margin: "20px" }}>
                                                     {warning.date}
@@ -380,8 +377,21 @@ function Warnings() {
                                                     }}
                                                     color="error"
                                                     variant="contained"
+                                                    onClick={() => {
+                                                        let data = {
+                                                            operation_id:
+                                                                warning.operation_id,
+                                                            user_id:
+                                                                currentState
+                                                                    .login.user
+                                                                    .user_id,
+                                                        };
+                                                        dispatch(
+                                                            removeAWarning(data)
+                                                        );
+                                                    }}
                                                 >
-                                                    Show Details
+                                                    Remove the Warning
                                                 </Button>
                                             </Box>
                                         </>
