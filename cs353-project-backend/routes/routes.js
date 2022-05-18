@@ -43,6 +43,32 @@ const routes = (router) => {
         "/removeAWarning",
         new ManageLibrarianController().RemoveAWarning
     );
+    router.post(
+        "/bringAllCourses",
+        new ManageLibrarianController().BringAllCourses
+    );
+    router.post("/addCourse", new ManageLibrarianController().AddCourse);
+    router.post(
+        "/bringMyCourses",
+        new ManageLibrarianController().BringMyCourses
+    );
+    router.post(
+        "/bringStudentsForChoosenCourse",
+        new ManageLibrarianController().BringStudentsForChoosenCourse
+    );
+    router.post(
+        "/assignLibraryItem",
+        new ManageLibrarianController().AssignLibraryItem
+    );
+    router.post(
+        "/bringAssignedLibraryItems",
+        new ManageLibrarianController().BringAssignedLibraryItems
+    );
+    router.post(
+        "/bringFilteredLibraryItems",
+        new ManageLibrarianController().BringFilteredLibraryItems
+    );
+    router.post("/bringReports", new ManageLibrarianController().BringReports);
 };
 
 module.exports = routes;

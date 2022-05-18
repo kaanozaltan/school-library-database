@@ -66,11 +66,18 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Slide from "@mui/material/Slide";
 // import SearchBar from "material-ui-search-bar";
 import Modal from "@mui/material/Modal";
 import {
+    assignLibraryItem,
     bringAllLibraryItems,
+    bringFilteredLibraryItems,
+    bringMyCourses,
+    bringStudentsForChoosenCourse,
     holdALibraryItem,
 } from "../store/actions/all.actions.js";
 const theme = createTheme();
@@ -104,6 +111,7 @@ function LibraryItems() {
         authorFilter: "",
         yearFilter: "",
         typeFilter: "",
+        choosedCourse: "",
     });
     const [open, setOpen] = React.useState(false);
     const [open2, setOpen2] = React.useState(false);
@@ -143,6 +151,15 @@ function LibraryItems() {
     useEffect(() => {
         dispatch(bringAllLibraryItems());
     }, []);
+
+    useEffect(() => {
+        if (values.choosedCourse != "") {
+            let data = {
+                course_id: values.choosedCourse,
+            };
+            dispatch(bringStudentsForChoosenCourse(data));
+        }
+    }, [values.choosedCourse]);
 
     return (
         <>
@@ -256,46 +273,95 @@ function LibraryItems() {
                                     return null;
                                 }}
                             /> */}
+                            <ToggleButtonGroup
+                                color="primary"
+                                value={values.status}
+                                exclusive
+                                style={{ margin: "auto", textAlign: "center" }}
+                            >
+                                {currentState.all.myCourses.map((course) => {
+                                    return (
+                                        <ToggleButton
+                                            value={course.course_id}
+                                            style={{
+                                                backgroundColor:
+                                                    values.choosedCourse ==
+                                                    course.course_id
+                                                        ? "#9ed0ff"
+                                                        : "",
+                                            }}
+                                            onClick={() => {
+                                                setValues({
+                                                    ...values,
+                                                    ["choosedCourse"]:
+                                                        course.course_id,
+                                                });
+                                            }}
+                                        >
+                                            {course.course_name}
+                                        </ToggleButton>
+                                    );
+                                })}
+                            </ToggleButtonGroup>
                             <Table aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Name</TableCell>
                                         <TableCell>Id</TableCell>
                                         <TableCell>Status</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {students.map((student) => {
-                                        return (
-                                            <>
-                                                <TableRow>
-                                                    <TableCell>
-                                                        {student.name}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {student.id}
-                                                    </TableCell>
-
-                                                    <TableCell>
-                                                        <Button
-                                                            color="success"
-                                                            style={{
-                                                                backgroundColor:
-                                                                    "green",
-                                                                color: "white",
-                                                                padding: "5px",
-                                                                borderRadius:
-                                                                    "3px",
-                                                            }}
-                                                        >
-                                                            {" "}
-                                                            Assigned{" "}
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            </>
-                                        );
-                                    })}
+                                    {currentState.all.studentsForTheChoosenCourse.map(
+                                        (student) => {
+                                            return (
+                                                <>
+                                                    <TableRow>
+                                                        <TableCell>
+                                                            {student.user_id}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Button
+                                                                color="success"
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        "green",
+                                                                    color:
+                                                                        "white",
+                                                                    padding:
+                                                                        "5px",
+                                                                    borderRadius:
+                                                                        "3px",
+                                                                }}
+                                                                onClick={() => {
+                                                                    let data = {
+                                                                        student_user_id:
+                                                                            student.user_id,
+                                                                        catalog_id:
+                                                                            values
+                                                                                .choosedLibraryItemForAssignment
+                                                                                .catalog_id,
+                                                                        instructor_user_id:
+                                                                            currentState
+                                                                                .login
+                                                                                .user
+                                                                                .user_id,
+                                                                    };
+                                                                    dispatch(
+                                                                        assignLibraryItem(
+                                                                            data
+                                                                        )
+                                                                    );
+                                                                }}
+                                                            >
+                                                                {" "}
+                                                                Assign{" "}
+                                                            </Button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                </>
+                                            );
+                                        }
+                                    )}
                                 </TableBody>
                             </Table>
                         </>
@@ -304,11 +370,11 @@ function LibraryItems() {
             </Modal>
             <ThemeProvider theme={theme}>
                 <Box
-                    xs={{ mt: 10 }}
+                    xs={{ m: 10, p: 10 }}
                     style={{
                         margin: "auto",
                         marginTop: "50px",
-                        maxWidth: "850px",
+                        // maxWidth: "850px",
                     }}
                 >
                     {/* <SearchBar
@@ -354,8 +420,7 @@ function LibraryItems() {
                             >
                                 <TableContainer
                                     sx={{
-                                        minWidth: 650,
-                                        maxWidth: 800,
+                                        maxWidth: 1200,
                                         justifyContent: "center",
                                         textAlign: "center",
                                     }}
@@ -439,7 +504,11 @@ function LibraryItems() {
                                                 <TableCell>
                                                     <Button
                                                         onClick={() => {
-                                                            dispatch();
+                                                            dispatch(
+                                                                bringFilteredLibraryItems(
+                                                                    values
+                                                                )
+                                                            );
                                                             return null;
                                                         }}
                                                         color="success"
@@ -593,7 +662,8 @@ function LibraryItems() {
                                                                             .user &&
                                                                         currentState
                                                                             .login
-                                                                            .user ==
+                                                                            .user
+                                                                            .user_type ==
                                                                             "INSTRUCTOR" && (
                                                                             <Button
                                                                                 onClick={() => {
@@ -602,6 +672,20 @@ function LibraryItems() {
                                                                                             ...values,
                                                                                             ["choosedLibraryItemForAssignment"]: libraryItem,
                                                                                         }
+                                                                                    );
+                                                                                    let data = values;
+                                                                                    data[
+                                                                                        "user_id"
+                                                                                    ] =
+                                                                                        currentState.login.user.user_id;
+                                                                                    data[
+                                                                                        "user_type"
+                                                                                    ] =
+                                                                                        currentState.login.user.user_type;
+                                                                                    dispatch(
+                                                                                        bringMyCourses(
+                                                                                            data
+                                                                                        )
                                                                                     );
                                                                                     setOpenAssignModal(
                                                                                         true

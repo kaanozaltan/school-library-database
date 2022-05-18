@@ -552,6 +552,148 @@ module.exports = class ManageLibrarianController {
         });
     }
 
+    async BringAllCourses(req, res) {
+        let { user_id, user_type } = req.body;
+        if (user_type == "INSTRUCTOR") {
+            let sql = "SELECT * from course";
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                    return;
+                }
+                res.json(results);
+            });
+        } else if (user_type == "STUDENT") {
+            let sql = "SELECT * from course";
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                    return;
+                }
+                res.json(results);
+            });
+        }
+    }
+
+    async BringAssignedLibraryItems(req, res) {
+        let { user_id } = req.body;
+        let sql =
+            "SELECT * from assign NATURAL JOIN library_item WHERE student_user_id=" +
+            user_id;
+
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.log(err);
+                res.json(err);
+                return;
+            }
+            res.json(results);
+        });
+    }
+
+    async AssignLibraryItem(req, res) {
+        let { student_user_id, catalog_id, instructor_user_id } = req.body;
+        let sql =
+            "INSERT INTO assign VALUES (" +
+            catalog_id +
+            ", " +
+            student_user_id +
+            ", " +
+            instructor_user_id +
+            ")";
+
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.log(err);
+                res.json(err);
+                return;
+            }
+            res.json({ msg: "Assigned the library item successfuly!" });
+            return;
+        });
+    }
+    async BringMyCourses(req, res) {
+        let { user_id, user_type } = req.body;
+        if (user_type == "INSTRUCTOR") {
+            let sql =
+                "SELECT * from teaches CROSS JOIN course where user_id=" +
+                user_id +
+                " and course.course_id= teaches.course_id";
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                    return;
+                }
+                res.json(results);
+            });
+        } else if (user_type == "STUDENT") {
+            let sql =
+                "SELECT * from takes CROSS JOIN course where user_id=" +
+                user_id +
+                " and course.course_id=takes.course_id";
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                    return;
+                }
+                res.json(results);
+            });
+        }
+    }
+
+    async BringStudentsForChoosenCourse(req, res) {
+        let { course_id } = req.body;
+        let sql =
+            "SELECT distinct * from student NATURAL JOIN takes where course_id=" +
+            course_id;
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.log(err);
+                res.json(err);
+                return;
+            }
+            console.log(results);
+            res.json(results);
+        });
+    }
+
+    async AddCourse(req, res) {
+        let { user_id, user_type, course_id } = req.body;
+        if (user_type == "INSTRUCTOR") {
+            let sql =
+                "INSERT INTO teaches VALUES (" +
+                course_id +
+                ", " +
+                user_id +
+                ")";
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                    return;
+                }
+                res.json({ msg: "Successfull" });
+                return;
+            });
+        } else if (user_type == "STUDENT") {
+            let sql =
+                "INSERT INTO takes VALUES (" + course_id + ", " + user_id + ")";
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                    return;
+                }
+                res.json({ msg: "Successfull" });
+                return;
+            });
+        }
+    }
+
     async BringAllAvailableAndHoldedItemsForLend(req, res) {
         let { user_id } = req.body;
 
@@ -594,7 +736,8 @@ module.exports = class ManageLibrarianController {
         });
     }
     async BringAllUsers(req, res) {
-        let sql = "SELECT user_id, last_name from user";
+        let sql =
+            "SELECT user_id, last_name from user where user_type <> 'LIBRARIAN'";
         connection.query(sql, (err, results) => {
             if (err) {
                 console.log(err);
@@ -606,21 +749,45 @@ module.exports = class ManageLibrarianController {
     }
 
     async BringFilteredUsers(req, res) {
-        let { nameFilter, idFilter } = req.body;
+        let { nameFilter, idFilter, userTypeFilter } = req.body;
         nameFilter = nameFilter.replace(/\s/g, "");
         idFilter = idFilter.replace(/\s/g, "");
-
-        let sql =
-            "SELECT user_id, last_name FROM user WHERE user_id REGEXP '." +
-            idFilter +
-            "*|" +
-            idFilter +
-            ".*'" +
-            " AND last_name REGEXP '." +
-            nameFilter +
-            "*|" +
-            nameFilter +
-            ".*'";
+        let sql;
+        if (userTypeFilter == "ALL") {
+            sql =
+                "SELECT user_id, last_name FROM user WHERE user_id REGEXP '." +
+                idFilter +
+                "+|" +
+                idFilter +
+                ".+|" +
+                idFilter +
+                "'" +
+                " AND last_name REGEXP '." +
+                nameFilter +
+                "+|" +
+                nameFilter +
+                ".+|" +
+                nameFilter +
+                "' and user_type <> 'LIBRARIAN'";
+        } else {
+            sql =
+                "SELECT user_id, last_name FROM user WHERE user_id REGEXP '." +
+                idFilter +
+                "+|" +
+                idFilter +
+                ".+|" +
+                idFilter +
+                "'" +
+                " AND last_name REGEXP '." +
+                nameFilter +
+                "+|" +
+                nameFilter +
+                ".+|" +
+                nameFilter +
+                "' and user_type='" +
+                userTypeFilter +
+                "' and user_type <> 'LIBRARIAN'";
+        }
 
         connection.query(sql, (err, results) => {
             if (err) {
@@ -630,21 +797,57 @@ module.exports = class ManageLibrarianController {
             console.log(results);
             res.json(results);
         });
+    }
 
-        // if (nameFilter.length != 0 && idFilter.length != 0) {
-        //     let sql = "SELECT user_id";
-        // } else if (nameFilter.length != 0) {
-        // } else if (idFilter.length != 0) {
-        // } else {
-        //     let sql = "SELECT user_id, last_name from user";
-        //     connection.query(sql, (err, results) => {
-        //         if (err) {
-        //             console.log(err);
-        //             return;
-        //         }
-        //         console.log(results);
-        //         res.json(results);
-        //     });
-        // }
+    async BringFilteredLibraryItems(req, res) {
+        let { titleFilter, authorFilter, yearFilter, typeFilter } = req.body;
+        let sql =
+            "SELECT * FROM library_item WHERE title REGEXP '." +
+            titleFilter +
+            "+|" +
+            titleFilter +
+            ".+|" +
+            titleFilter +
+            "' and authors REGEXP '." +
+            authorFilter +
+            "+|" +
+            authorFilter +
+            ".+|" +
+            authorFilter +
+            "' and publish_year REGEXP '." +
+            yearFilter +
+            "+|" +
+            yearFilter +
+            ".+|" +
+            yearFilter +
+            "' and type REGEXP '." +
+            typeFilter +
+            "+|" +
+            typeFilter +
+            ".+|" +
+            typeFilter +
+            "'";
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.log(err);
+                res.json(err);
+                return;
+            }
+            console.log(results);
+            res.json(results);
+        });
+    }
+
+    async BringReports(req, res) {
+        let sql =
+            "SELECT genre_name, count(*) AS cnt FROM library_item NATURAL JOIN belongs NATURAL JOIN genre GROUP BY genre_name;";
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.log(err);
+                res.json(err);
+                return;
+            }
+            res.json(results);
+        });
     }
 };

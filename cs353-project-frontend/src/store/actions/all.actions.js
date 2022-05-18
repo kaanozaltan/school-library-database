@@ -65,6 +65,27 @@ export function bringFilteredUsers(filter) {
     };
 }
 
+export function bringFilteredLibraryItems(filter) {
+    return (dispatch) => {
+        axios
+            .post("http://localhost:8080/bringFilteredLibraryItems", filter)
+            .then((res) => {
+                console.log("reserve response ", res.data);
+                dispatch({
+                    type: Actions.BRING_ALL_LIBRARY_ITEMS,
+                    payload: res.data,
+                });
+                if ("msg" in res.data) {
+                    alert(res.data.msg);
+                }
+            })
+            .catch((err) => {
+                alert("Error");
+                console.log(err);
+            });
+    };
+}
+
 export function bringAllLibraryItems() {
     return (dispatch) => {
         axios
@@ -320,6 +341,210 @@ export function removeAWarning(data) {
                         alert(res.data.code);
                     return;
                 }
+            })
+            .catch((err) => {
+                alert(err);
+                console.log(err);
+            });
+    };
+}
+
+export function bringAllCourses(data) {
+    return (dispatch) => {
+        axios
+            .post("http://localhost:8080/bringAllCourses", data)
+            .then((res) => {
+                console.log("bring all courses response ", res.data);
+                if ("msg" in res.data) {
+                    alert(res.data.msg);
+                    return;
+                }
+                dispatch({
+                    type: Actions.BRING_ALL_COURSES,
+                    payload: res.data,
+                });
+                if ("code" in res.data) {
+                    if (res.data.code != "ER_BAD_FIELD_ERROR")
+                        alert(res.data.code);
+                    return;
+                }
+            })
+            .catch((err) => {
+                alert(err);
+                console.log(err);
+            });
+    };
+}
+
+export function bringMyCourses(data) {
+    return (dispatch) => {
+        axios
+            .post("http://localhost:8080/bringMyCourses", data)
+            .then((res) => {
+                console.log("bring my courses response ", res.data);
+                if ("msg" in res.data) {
+                    alert(res.data.msg);
+                    return;
+                }
+                dispatch({
+                    type: Actions.BRING_MY_COURSES,
+                    payload: res.data,
+                });
+                if ("code" in res.data) {
+                    if (res.data.code != "ER_BAD_FIELD_ERROR")
+                        alert(res.data.code);
+                    return;
+                }
+            })
+            .catch((err) => {
+                alert(err);
+                console.log(err);
+            });
+    };
+}
+
+export function addCourse(data) {
+    return (dispatch) => {
+        axios
+            .post("http://localhost:8080/addCourse", data)
+            .then((res) => {
+                console.log("add courses response ", res.data);
+                if ("msg" in res.data) {
+                    dispatch(bringMyCourses(data));
+                    alert(res.data.msg);
+                    return;
+                }
+
+                // dispatch({
+                //     type: Actions.BRING_ALL_COURSES,
+                //     payload: res.data,
+                // });
+                if ("code" in res.data) {
+                    if (res.data.code != "ER_BAD_FIELD_ERROR")
+                        alert(res.data.code);
+                    return;
+                }
+            })
+            .catch((err) => {
+                alert(err);
+                console.log(err);
+            });
+    };
+}
+
+export function bringStudentsForChoosenCourse(data) {
+    return (dispatch) => {
+        axios
+            .post("http://localhost:8080/bringStudentsForChoosenCourse", data)
+            .then((res) => {
+                console.log(
+                    "bring students for choosen course response ",
+                    res.data
+                );
+                if ("msg" in res.data) {
+                    // dispatch(bringMyCourses(data));
+                    alert(res.data.msg);
+                    return;
+                }
+
+                dispatch({
+                    type: Actions.BRING_STUDENTS_FOR_THE_CHOOSEN_COURSE,
+                    payload: res.data,
+                });
+                if ("code" in res.data) {
+                    if (res.data.code != "ER_BAD_FIELD_ERROR")
+                        alert(res.data.code);
+                    return;
+                }
+            })
+            .catch((err) => {
+                alert(err);
+                console.log(err);
+            });
+    };
+}
+
+export function assignLibraryItem(data) {
+    return (dispatch) => {
+        axios
+            .post("http://localhost:8080/assignLibraryItem", data)
+            .then((res) => {
+                console.log("assign library item response ", res.data);
+                if ("msg" in res.data) {
+                    // dispatch(bringMyCourses(data));
+                    alert(res.data.msg);
+                    return;
+                }
+
+                // dispatch({
+                //     type: Actions.BRING_STUDENTS_FOR_THE_CHOOSEN_COURSE,
+                //     payload: res.data,
+                // });
+                if ("sqlMessage" in res.data) {
+                    if (res.data.code != "ER_BAD_FIELD_ERROR")
+                        alert(res.data.sqlMessage);
+                    return;
+                }
+            })
+            .catch((err) => {
+                alert(err);
+                console.log(err);
+            });
+    };
+}
+
+export function bringAssignedLibraryItems(data) {
+    return (dispatch) => {
+        axios
+            .post("http://localhost:8080/bringAssignedLibraryItems", data)
+            .then((res) => {
+                console.log("bringAssignedLibraryItem   response ", res.data);
+                if ("msg" in res.data) {
+                    // dispatch(bringMyCourses(data));
+                    alert(res.data.msg);
+                    return;
+                }
+
+                if ("sqlMessage" in res.data) {
+                    if (res.data.code != "ER_BAD_FIELD_ERROR")
+                        alert(res.data.sqlMessage);
+                    return;
+                }
+
+                dispatch({
+                    type: Actions.BRING_ASSIGNED_LIBRARY_ITEMS,
+                    payload: res.data,
+                });
+            })
+            .catch((err) => {
+                alert(err);
+                console.log(err);
+            });
+    };
+}
+
+export function bringReports(data) {
+    return (dispatch) => {
+        axios
+            .post("http://localhost:8080/bringReports", data)
+            .then((res) => {
+                console.log("bring reports   response ", res.data);
+                if ("msg" in res.data) {
+                    // dispatch(bringMyCourses(data));
+                    alert(res.data.msg);
+                    return;
+                }
+
+                if ("sqlMessage" in res.data) {
+                    if (res.data.code != "ER_BAD_FIELD_ERROR")
+                        alert(res.data.sqlMessage);
+                    return;
+                }
+
+                dispatch({
+                    type: Actions.BRING_REPORTS,
+                    payload: res.data,
+                });
             })
             .catch((err) => {
                 alert(err);

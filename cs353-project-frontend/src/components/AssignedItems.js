@@ -69,6 +69,10 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 // import SearchBar from "material-ui-search-bar";
 import Modal from "@mui/material/Modal";
+import {
+    bringAssignedLibraryItem,
+    bringAssignedLibraryItems,
+} from "../store/actions/all.actions.js";
 const theme = createTheme();
 
 const style = {
@@ -178,6 +182,14 @@ function AssignedItems() {
         return state;
     });
 
+    useEffect(() => {
+        if ("user_id" in currentState.login.user) {
+            let data = {
+                user_id: currentState.login.user.user_id,
+            };
+            dispatch(bringAssignedLibraryItems(data));
+        }
+    }, [currentState.login.user]);
     return (
         <>
             <Dialog
@@ -343,7 +355,7 @@ function AssignedItems() {
                     style={{
                         margin: "auto",
                         marginTop: "50px",
-                        maxWidth: "850px",
+                        maxWidth: "1200px",
                     }}
                 >
                     {/* <SearchBar
@@ -392,8 +404,7 @@ function AssignedItems() {
                             >
                                 <TableContainer
                                     sx={{
-                                        minWidth: 650,
-                                        maxWidth: 800,
+                                        maxWidth: 1200,
                                         justifyContent: "center",
                                         textAlign: "center",
                                     }}
@@ -403,51 +414,64 @@ function AssignedItems() {
                                         <TableHead>
                                             <TableRow>
                                                 <TableCell>Name</TableCell>
-                                                <TableCell>Type</TableCell>
+                                                <TableCell>Authors</TableCell>
                                                 <TableCell>
-                                                    Instructor
+                                                    Publish Year
                                                 </TableCell>
+                                                <TableCell>Type</TableCell>
+                                                {/* <TableCell>
+                                                    Instructor
+                                                </TableCell> */}
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {books.map((libraryItem, index) => {
-                                                return (
-                                                    <>
-                                                        <TableRow
-                                                            key={
-                                                                libraryItem.catalog_id
-                                                            }
-                                                            sx={{
-                                                                "&:last-child td, &:last-child th": {
-                                                                    border: 0,
-                                                                },
-                                                                minHeight:
-                                                                    "100px",
-                                                            }}
-                                                        >
-                                                            <TableCell>
-                                                                {libraryItem.title +
-                                                                    " " +
-                                                                    libraryItem
-                                                                        .authors[0]
-                                                                        .author +
-                                                                    " published at " +
-                                                                    libraryItem.publish_year}
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {
-                                                                    libraryItem.type
+                                            {currentState.all.assignedLibraryItems.map(
+                                                (libraryItem, index) => {
+                                                    return (
+                                                        <>
+                                                            <TableRow
+                                                                key={
+                                                                    libraryItem.catalog_id
                                                                 }
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {
-                                                                    libraryItem.assignedBy
-                                                                }
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    </>
-                                                );
-                                            })}
+                                                                sx={{
+                                                                    "&:last-child td, &:last-child th": {
+                                                                        border: 0,
+                                                                    },
+                                                                    minHeight:
+                                                                        "100px",
+                                                                }}
+                                                            >
+                                                                <TableCell>
+                                                                    {
+                                                                        libraryItem.title
+                                                                    }
+                                                                </TableCell>
+
+                                                                <TableCell>
+                                                                    {
+                                                                        libraryItem.authors
+                                                                    }
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {
+                                                                        libraryItem.publish_year
+                                                                    }
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {
+                                                                        libraryItem.type
+                                                                    }
+                                                                </TableCell>
+                                                                {/* <TableCell>
+                                                                    {libraryItem.first_name +
+                                                                        " " +
+                                                                        libraryItem.last_name}
+                                                                </TableCell> */}
+                                                            </TableRow>
+                                                        </>
+                                                    );
+                                                }
+                                            )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

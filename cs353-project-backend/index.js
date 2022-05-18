@@ -65,14 +65,6 @@ app.use(express.json());
 
 route(app);
 
-// app.get("/", function (req, res) {
-//     sql : "SELECT * FROM EMPLOYEE_INFO";
-//     connection.query(sql, function (err, results) {
-//         if (err) throw err;
-//         res.send(results);
-//     });
-// });
-
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

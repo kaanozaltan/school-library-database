@@ -97,31 +97,31 @@ module.exports = class UserSignupController {
                     console.log(err);
                     res.json({ msg: "Error" });
                     return;
-                    sql =
-                        "INSERT INTO instructor VALUES ( '" +
-                        user_id +
-                        "','" +
-                        department +
-                        "' ,'" +
-                        office_number +
-                        "' )";
-                    connection.query(sql, (err, results) => {
-                        console.log(err);
-                        // console.log(results);
-                        if (err) {
-                            res.json({
-                                msg: "ERROR",
-                            });
-                            return;
-                        } else {
-                            res.json({
-                                msg:
-                                    "Succesfully create the instructor with id " +
-                                    user_id,
-                            });
-                        }
-                    });
                 }
+                sql =
+                    "INSERT INTO instructor VALUES ( '" +
+                    user_id +
+                    "','" +
+                    department +
+                    "' ,'" +
+                    office_number +
+                    "' )";
+                connection.query(sql, (err, results) => {
+                    console.log(err);
+                    // console.log(results);
+                    if (err) {
+                        res.json({
+                            msg: "ERROR",
+                        });
+                        return;
+                    } else {
+                        res.json({
+                            msg:
+                                "Succesfully create the instructor with id " +
+                                user_id,
+                        });
+                    }
+                });
             });
         }
 

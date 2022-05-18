@@ -195,7 +195,7 @@ function RegisterANewUser() {
                                     label="First name"
                                     variant="standard"
                                     value={values.first_name}
-                                    onChange={handleChange("name")}
+                                    onChange={handleChange("first_name")}
                                     type="text"
                                 />
                                 <TextField
@@ -204,7 +204,7 @@ function RegisterANewUser() {
                                     label="Last name"
                                     variant="standard"
                                     value={values.last_name}
-                                    onChange={handleChange("name")}
+                                    onChange={handleChange("last_name")}
                                     type="text"
                                 />
                                 <TextField
@@ -213,7 +213,7 @@ function RegisterANewUser() {
                                     label="User name"
                                     variant="standard"
                                     value={values.user_name}
-                                    onChange={handleChange("name")}
+                                    onChange={handleChange("user_name")}
                                     type="text"
                                 />
                                 <TextField
@@ -245,6 +245,16 @@ function RegisterANewUser() {
                                     onChange={handleChange("department")}
                                     placeholder="CS"
                                     type="text"
+                                />
+                                <TextField
+                                    sx={{ m: 1, width: "100%" }}
+                                    id="standard-basic"
+                                    label="Password"
+                                    variant="standard"
+                                    value={values.password}
+                                    onChange={handleChange("password")}
+                                    placeholder=""
+                                    type="tel"
                                 />
                             </>
                         ) : (
@@ -313,6 +323,16 @@ function RegisterANewUser() {
                                     onChange={handleChange("department")}
                                     placeholder="CS"
                                     type="text"
+                                />
+                                <TextField
+                                    sx={{ m: 1, width: "100%" }}
+                                    id="standard-basic"
+                                    label="Password"
+                                    variant="standard"
+                                    value={values.password}
+                                    onChange={handleChange("password")}
+                                    placeholder=""
+                                    type="tel"
                                 />
                                 <FormGroup>
                                     <FormControlLabel

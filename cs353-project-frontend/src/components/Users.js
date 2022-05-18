@@ -239,7 +239,7 @@ function Users() {
                             return null;
                         }}
                     /> */}
-                    {currentState.all.bringAllUsers.length == 0 ? (
+                    {false ? (
                         <>
                             <Box
                                 sx={{
@@ -391,6 +391,8 @@ function Users() {
                                                                             values.nameFilter,
                                                                         idFilter:
                                                                             values.idFilter,
+                                                                        userTypeFilter:
+                                                                            values.userType,
                                                                     }
                                                                 )
                                                             );

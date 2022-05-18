@@ -41,6 +41,7 @@ const librarianPages = [
     { name: "Users", link: "users" },
     { name: "Register A New Item", link: "registerANewItem" },
     { name: "Register A New User", link: "registerANewUser" },
+    { name: "Reports ", link: "reports" },
 ];
 const studentPages = [
     { name: "Home", link: "home" },
@@ -48,12 +49,14 @@ const studentPages = [
     { name: "Assigned Items", link: "assignedItems" },
     { name: "My Items", link: "myItems" },
     { name: "Warnings", link: "warnings" },
+    { name: "Courses", link: "courses" },
 ];
 const instructorPages = [
     { name: "Home", link: "home" },
     { name: "Library Items", link: "libraryItems" },
     { name: "My Items", link: "myItems" },
     { name: "Warnings", link: "warnings" },
+    { name: "Courses", link: "courses" },
 ];
 // const settings = [
 //     { name: "Profile", link: "profile" },
@@ -198,22 +201,23 @@ function Navbar() {
                                             }}
                                         >
                                             {pages.map((page) => (
-                                                <MenuItem
-                                                    key={page.name}
-                                                    onClick={handleCloseNavMenu}
+                                                <Link
+                                                    to={"/" + page.link}
+                                                    style={{
+                                                        textDecoration: "none",
+                                                    }}
                                                 >
-                                                    <Link
-                                                        to={"/" + page.link}
-                                                        style={{
-                                                            textDecoration:
-                                                                "none",
-                                                        }}
+                                                    <MenuItem
+                                                        key={page.name}
+                                                        onClick={
+                                                            handleCloseNavMenu
+                                                        }
                                                     >
                                                         <Typography textAlign="center">
                                                             {page.name}
                                                         </Typography>
-                                                    </Link>
-                                                </MenuItem>
+                                                    </MenuItem>
+                                                </Link>
                                             ))}
                                         </Menu>
                                     </Box>
@@ -225,9 +229,7 @@ function Navbar() {
                                             flexGrow: 1,
                                             display: { xs: "flex", md: "none" },
                                         }}
-                                    >
-                                        ""
-                                    </Typography>
+                                    ></Typography>
                                     <Box
                                         sx={{
                                             flexGrow: 1,
@@ -235,25 +237,24 @@ function Navbar() {
                                         }}
                                     >
                                         {pages.map((page) => (
-                                            <Button
-                                                key={page.name}
-                                                onClick={handleCloseNavMenu}
-                                                sx={{
-                                                    my: 2,
+                                            <Link
+                                                to={"/" + page.link}
+                                                style={{
                                                     color: "white",
-                                                    display: "block",
+                                                    textDecoration: "none",
                                                 }}
                                             >
-                                                <Link
-                                                    to={"/" + page.link}
-                                                    style={{
+                                                <Button
+                                                    key={page.name}
+                                                    onClick={handleCloseNavMenu}
+                                                    sx={{
                                                         color: "white",
-                                                        textDecoration: "none",
+                                                        display: "block",
                                                     }}
                                                 >
                                                     {page.name}
-                                                </Link>
-                                            </Button>
+                                                </Button>
+                                            </Link>
                                         ))}
                                     </Box>
 

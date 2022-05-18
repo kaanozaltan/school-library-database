@@ -22,7 +22,7 @@ export function userLogin(user, navigate) {
                 }
             })
             .catch((err) => {
-                alert("you could not logged in");
+                alert("Error!");
                 console.log(err);
             });
     };
@@ -45,7 +45,7 @@ export function userRegister(user, navigate) {
                 //navigate("/login");
             })
             .catch((err) => {
-                alert("you could not sign up");
+                alert("Error !");
                 console.log(err);
             });
     };

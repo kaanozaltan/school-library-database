@@ -18,6 +18,8 @@ import MyItems from "./components/MyItems.js";
 import Warnings from "./components/Warnings.js";
 import Users from "./components/Users.js";
 import RegisterANewItem from "./components/RegisterANewItem.js";
+import Courses from "./components/Courses.js";
+import Reports from "./components/Reports.js";
 
 export default function PageRoutes() {
     return (
@@ -46,6 +48,8 @@ export default function PageRoutes() {
                     <Route exact path="/myItems" element={<MyItems />} />
                     <Route exact path="/warnings" element={<Warnings />} />
                     <Route exact path="/users" element={<Users />} />
+                    <Route exact path="/courses" element={<Courses />} />
+                    <Route exact path="/reports" element={<Reports />} />
                     <Route
                         exact
                         path="/registerANewItem"
