@@ -1,0 +1,11 @@
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+}
+
+* td {
+    white-space: nowrap;
+}

@@ -1,0 +1,2 @@
+reset
+node index.js
