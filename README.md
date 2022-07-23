@@ -6,7 +6,7 @@ This project is an online database to satisfy different needs of a university li
 Each library item in the system will have a unique ID, title, author or authors, call number, date of publication, year of publication, availability status, language, publisher and description. There are two types of library items, books and journals. Books have edition and print location as extra values while journals have volume and issue. The library items can be listed using combinations of several filters on different attributes by all user types.
 
 ## Use Case Diagram
-![Use case diagram](use_case.jpg)
+![Use case diagram](https://kaanozaltan.github.io/school-library-database/use_case.jpg)
 
 ## Reports
 [Proposal](https://kaanozaltan.github.io/school-library-database/proposal.pdf)
